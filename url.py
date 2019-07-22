@@ -9,7 +9,7 @@ import datetime
 import threading
 from requests.auth import HTTPBasicAuth
 
-
+arg = [os.environ['ARG0'], os.environ['ARG1']]
 def AuthToken():
  consumer_key = "pwhF6qP4EG3KAqisthlJcrdBQFLKr4FM"
  consumer_secret = "dS90sUTgKWrq30Qz"
@@ -38,10 +38,10 @@ def stkPush(token):
     "Password": encodedStr, 
     "Timestamp": timestamp, 
     "TransactionType": "CustomerPayBillOnline", 
-    "Amount": "1", 
-    "PartyA": "25472431383", 
-    "PartyB": "174379", 
-    "PhoneNumber": "254724341383", 
+    "Amount": arg[1], 
+    "PartyA": arg[0], 
+    "PartyB": bsc, 
+    "PhoneNumber": arg[0], 
     "CallBackURL": "https://sandbox.safaricom.co.ke/",
     "AccountReference": "ref", 
     "TransactionDesc": "please work" 
@@ -60,7 +60,7 @@ def stkPush(token):
 
 
 
-
+# optimize memory management
 
 def Query(token,shortcode,password,timestamp,checkout):
     print (checkout)
@@ -72,8 +72,10 @@ def Query(token,shortcode,password,timestamp,checkout):
         "CheckoutRequestID": checkout
     }
     response = requests.post(api_url, json = request, headers=headers)
-    con1 = response.json()
-    print (con1)
+    res1 = response.json()["ResultCode"]
+    # res2 = res1["ResultCode"]
+
+    print (res1)
 
 
 stkPush(AuthToken())
