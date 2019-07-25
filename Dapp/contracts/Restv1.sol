@@ -10,7 +10,7 @@ contract Restv1 is usingProvable {
     
     struct Queuevalues {
         string phoneNumber;
-        string amount;
+        uint amount;
         bytes32 queryId;
     }
     
@@ -30,6 +30,8 @@ contract Restv1 is usingProvable {
         for (uint256 index = 0; index < queueArray.length; index++) {
             if (Queuemap[queueArray[index]].queryId == _myid){
                 if (keccak256(abi.encodePacked(_result)) != keccak256(abi.encodePacked("0"))) {
+                   uint256 amount = Queuemap[queueArray[index]].amount;
+                    balance[queueArray[index]] += amount;
                     delete Queuemap[queueArray[index]];
                     remove(index);
                 } else {
@@ -42,14 +44,15 @@ contract Restv1 is usingProvable {
 
     function _push
     (string memory _number,
-    string memory _amount) 
-    public 
-    payable 
-    {
-
-        bytes32 queryId = provable_query("computation",["QmSMmrkvggZPQPJjWsuLMHRnAHcmD4EvkC9tiya6zrrQ2Z",_number,_amount]);
+     uint _amount) 
+     public 
+     payable 
+     {
+        string memory  amo = uint2str(_amount);
+        bytes32 queryId = provable_query("computation",["QmSMmrkvggZPQPJjWsuLMHRnAHcmD4EvkC9tiya6zrrQ2Z",_number,amo]);
         emit LogNewProvableQuery('was sent standing in for an answer');
         Queuevalues storage queue = Queuemap[msg.sender];
+       
         address[] storage arr = queueArray;
         queue.phoneNumber = _number;
         queue.amount = _amount;
