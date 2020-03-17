@@ -1,0 +1,14 @@
+{
+  "NODE_ENV": "production",
+  "URL": "34.83.183.132",
+  "NODE_PORT": 3111,
+  "TEXT_SENDER": "34.83.183.132",
+  "MPESA_URL": "https://payments.bithela.com/api/home/kesholabs/stk",
+  "CARD_URL": "https://payments.bithela.com/api/home/kesholabs/stripe",
+  "SECRET_KEY": "secret",
+  "MONGO_DB_URL": "mongodb+srv://ticket:ticket@20!9@cluster0-lsdks.mongodb.net/TICKET?retryWrites=true&w=majority",
+  "APP_USERNAME": "TICKETAPP",
+  "APP_PASSWWORD": "TICKET@APP",
+  "EMAIL_APIKEY": "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",
+  "CRON":"* * * * * *"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "celo",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "yarn start",
+    "start": "NODE_ENV = development nodemon app.js",
+    "prod": "NODE_ENV = production nodemon app.js",
+    "test": "NODE_ENV = test jest"
+  },
+  "dependencies": {
+    "@celo/contractkit": "^0.3.0",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "jest": "^25.1.0",
+    "mongoose": "^5.9.5",
+    "web3": "^1.2.6",
+    "yargs": "^15.3.1"
+  }
+}

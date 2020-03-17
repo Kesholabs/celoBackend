@@ -1,0 +1,4 @@
+{
+  "NODE_ENV": "development",
+  "MONGO_DB_URL": "mongodb+srv://ticket:ticket@20!9@cluster0-lsdks.mongodb.net/TICKET?retryWrites=true&w=majority"
+}
