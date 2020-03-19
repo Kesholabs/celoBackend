@@ -1,11 +1,4 @@
 const express = require('express')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const userModel = require('../../../models/users.model')
-const ethers = require('ethers')
-const {validationResult} = require('express-validator')
-const config = require('../../../config/env_config/config')
-
 
 const register = async (req,res,next) => {
     let errors = validationResult(req)
