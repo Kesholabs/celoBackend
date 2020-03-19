@@ -14,7 +14,17 @@ const definition = {
     version: "1.0.0"
   },
   host: `${process.env.HOST}:${process.env.PORT}`,
-  basePath: "/api/v1"
+  basePath: "/api/v1",
+  tags: [
+    {
+      name: "Account",
+      description: "This should allow users to create `WALLET ADDRESS AND THEIR PRIVATE KEY`."
+    },
+    {
+      name: "Transaction",
+      description: "This sholud allow users to transact `DEPOSIT WITHDRAW TRANSFER`"
+    }
+  ]
 };
 
 const options = {

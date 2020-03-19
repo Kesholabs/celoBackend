@@ -34,6 +34,7 @@ const Controller = require("../controller/accounts");
  *
  * /account/create:
  *   post:
+ *     tags: ['Account']
  *     description: Creates a user account
  *     produces:
  *       - application/json
@@ -60,6 +61,7 @@ router.post("/create", Controller.createAddressAccount);
  *
  *  /account/getaccount:
  *   post:
+ *     tags: ['Account']
  *     description: Creates a user account
  *     produces:
  *       - application/json
@@ -86,6 +88,7 @@ router.post("/getaccount", Controller.getWalletAddress);
  *
  *  /account/getbalance:
  *   post:
+ *     tags: ['Account']
  *     description: Creates a user account
  *     produces:
  *       - application/json
