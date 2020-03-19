@@ -5,6 +5,12 @@ const web3Instance = new web3();
 
 const register = async (req,res,next) => {
    const identity = req.body.phoneNumber
+   if (fs.existsSync(identity)) {
+    console.log(" account found, cannot create another one ");
+    return res.status(500).json({
+        Message:"failed User already exists"
+    });
+  }
     try {
         console.log("Creating a new account");
         const account = web3Instance.eth.accounts.create();
