@@ -1,6 +1,22 @@
-const web3 = require("web3");
-const fs = require("fs");
-const web3Instance = new web3();
+
+//const Web3= require('web3');
+//import Web3 from 'web3';
+
+const contractkit  = require('@celo/contractkit') 
+// const web3 = require('web3')
+// define localUrl and port with the ones of your node
+const localUrl = "52.10.248.99"
+const port = "8545"
+// const kit = newKit(`${localUrl}:${port}`)
+const kit = contractkit.newKit('https://alfajores-forno.celo-testnet.org')
+const web3 = kit.web3
+// const web3 = new Web3('https://alfajores-forno.celo-testnet.org')
+
+//  let ll = web3.eth.getBalance(someAddress)
+// console.log(ll)
+// const web3 = require("web3");
+// const fs = require("fs");
+// const web3Instance = new web3();
 
 const SECRET_PATH = ".secret";
 
@@ -34,13 +50,19 @@ const SECRET_PATH = ".secret";
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
  */
-function createAccount(identity) {
-  console.log("Creating a new account");
-  const account = web3Instance.eth.accounts.create();
-  console.log(`Made new account ${account.address}`);
-  fs.writeFileSync(identity, account.privateKey);
-  console.log(`Account private key saved to ${identity}`);
-  return account;
+async function createAccount() {
+  //console.log("Creating a new account");
+  // const account = web3.eth.personal.newAccount('!@superpassword');
+  // console.log(`Made new account ${account}`);
+  // personal = web3.eth.personal
+  // console.log(await web3.eth.getBalance('0xb51124ef4e3495a4063601027cd629bf6493ee7e'))
+  console.log(await web3.web3.rpc.getModules())
+  // web3.eth.personal.importRawKey("cd3376bb711cb332ee3fb2ca04c6a8b9f70c316fcdf7a1f44ef4c7999483295e", "password1234")
+  // .then(console.log);
+  //.then(console.log);
+  //fs.writeFileSync(identity, account.privateKey);
+  //console.log(`Account private key saved to ${}`);
+  // return account;
 }
 
 /**
@@ -70,6 +92,7 @@ async function getBalances(identity) {
   kit.stop();
   return balances.usd;
 }
+createAccount()
 
 module.exports = {
   createAccount,
