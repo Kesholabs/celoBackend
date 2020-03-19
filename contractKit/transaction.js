@@ -5,108 +5,76 @@ const Helper = require("../helper/helper");
 const accounts = require("./account");
 // const WalletQueries = require("../scripts/walletQueries");
 
-
-
 async function depositFunds(params) {
   console.log("\n================ DEPOSIT =================\n");
-  const celoUserWallet = await WalletQueries.fetchUserWallet(params.account);
-  const transID = Helper.setTranstype("Deposit");
-  // const newBalance = celoUserWallet.balance + params.amount;
-  // const data = {
-  //   transID: transID,
-  //   username: params.username,
-  //   account: params.account,
-  //   amount: params.amount,
-  //   balance: newBalance,
-  //   transType: "Deposit",
-  //   accountType: "MPESA"
-  // };
-  // return WalletQueries.updateUserWalletLogs(data);
+  const identity = params.account;
+  const amount = params.amount;
+
+  const walletAddress = await accounts.getAccount(identity).address;
+  const data = {
+    recipient: walletAddress,
+    amount: amount,
+    type: "Deposit"
+  };
+  return transferFunds(data);
 }
 
 async function withdrawFunds(params) {
   console.log("\n================ WITHDRAW =================\n");
-  const celoUserWallet = await WalletQueries.fetchUserWallet(params.account);
-  const balance = celoUserWallet.balance;
   if (balance < params.amount) return "Account has Insufficient balance";
-
-  // const newBalance = celoUserWallet.balance - params.amount;
-  // const transID = Helper.setTranstype(body.transType);
-  // const data = {
-  //   transID: transID,
-  //   username: params.username,
-  //   account: params.account,
-  //   amount: params.amount,
-  //   balance: newBalance,
-  //   transType: "Withdraw",
-  //   accountType: "MPESA"
-  // };
-  // return WalletQueries.updateUserWalletLogs(data);
 }
 
 async function transferFunds(params) {
-  const recipient = params.to;
+  console.log("\n================ TRANSFER =================\n");
+  const identity = params.account;
   const amount = params.amount;
-  const token = params.token;
-  const identity = params.phoneNumber;
-  console.log(`Sending payment of ${amount} ${token} to ${recipient}`);
+  const recipient = params.recipient;
+  const type = params.type;
 
-  //check if user Account has enough funds
-  const celoUserWallet = await WalletQueries.fetchUserWallet(identity);
-  const balance = celoUserWallet.balance;
-  if (balance < amount) return "Account has Insufficient balance";
-
-  // Set up your account in contract kit
-  const account = accounts.getAccount(identity);
-  const mainAccount = accounts.getAccount("_MainAccount");
-  kit.addAccount(account.privateKey);
-  kit.addAccount(mainAccount.privateKey);
-  kit.defaultAccount = mainAccount.address;
-  console.log("Kit account is set up");
-
-  // Get the right token contract
-  let contract;
-  if (token.toLowerCase() === "cusd") {
-    contract = await kit.contracts.getStableToken();
-  } else if (token.toLowerCase() === "cgld") {
-    contract = await kit.contracts.getGoldToken();
-  } else {
-    console.error(`Invalid token ${token}, use cGLD or cUSD`);
-    return false;
+  switch (type) {
+    case "Deposit":
+      console.log(`${type} payment of ${amount} to ${recipient}`);
+      return buyIn(recipient, amount);
+    case "Withdraw":
+      return buyOut(recipient, amount);
+    default:
+      return;
   }
-  console.log("Kit contract is set up, creating transaction");
+}
+
+async function buyIn(recipient, amount) {
+  // Set up your account in contract kit
+  const mainAccount = await accounts.getAccount("_MainAccount").address;
 
   //check if main account has enough funds
-  const organizationBalance = accounts.getBalances("_MainAccount");
+  const organizationBalance = await accounts.getBalances("_MainAccount");
   if (amount > organizationBalance)
     return `Main Account has insufficient Funds ${organizationBalance} to send amount ${amount}`;
 
+  // Get the right token contract
+  let contract = await kit.contracts.getStableToken();
+  console.log("Kit contract is set up, creating transaction");
+  return process(recipient, amount, mainAccount);
+}
+
+async function buyOut() {}
+
+async function process(recipient, amount, from) {
   // Create the payment transaction
-  const tx = await contract
-    .transfer(recipient, amount)
-    .send({ from: MAIN_ACCOUNT_ADDRESS });
+  const tx = await contract.transfer(recipient, amount).send({ from: from });
 
   const hash = await tx.getHash();
   console.log("Hash receipt recieved", hash);
   const receipt = await tx.waitReceipt();
   console.log("Tx receipt recieved", receipt);
-  const newOrganizationBalance = await contract.balanceOf(mainAccount.address);
-  const newBalance = await contract.balanceOf(account.address);
-  console.log(`New balance is ${newBalance.toString()}`);
-  kit.stop();
 
-  // const newBalance = celoUserWallet.balance - params.amount;
-  // const transID = Helper.setTranstype("Transfer");
-  // const data = {
-  //   transID: transID,
-  //   username: params.username,
-  //   account: recipient,
-  //   amount: params.amount,
-  //   balance: newBalance,
-  //   transType: "Transfer",
-  //   accountType: "cUSD"
-  // };
-  // WalletQueries.updateUserWalletLogs(data);
+  const newOrganizationBalance = await contract.balanceOf(from);
+  const newBalance = await contract.balanceOf(recipient);
+  console.log(`New Receipt balance is ${newBalance.toString()}`);
+  console.log(
+    `New Oganization balance is ${newOrganizationBalance.toString()}`
+  );
+  kit.stop();
 
   return {
     hash: hash,
@@ -122,7 +90,6 @@ module.exports = {
   withdrawFunds,
   depositFunds
 };
-
 
 /*
  * ACCOUNTING SCRIPT

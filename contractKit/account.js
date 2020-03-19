@@ -36,6 +36,7 @@ function getAccount(identity) {
   return account;
 }
 
+
 /**
  * TODO: FETCH WALLET BALANCE
  */
