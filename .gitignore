@@ -6,3 +6,5 @@ config.development.json
 config.production.json
 config.test.json
 public
+REST.rest
+.env

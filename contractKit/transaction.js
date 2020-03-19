@@ -2,24 +2,26 @@ const contractkit = require("@celo/contractkit");
 const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE THIS TO OUR NODE ADDRESS
 const kit = contractkit.newKit(NODE_URL);
 const Helper = require("../helper/helper");
-const WalletQueries = require("../scripts/walletQueries");
 const accounts = require("./account");
+// const WalletQueries = require("../scripts/walletQueries");
+
+
 
 async function depositFunds(params) {
   console.log("\n================ DEPOSIT =================\n");
   const celoUserWallet = await WalletQueries.fetchUserWallet(params.account);
   const transID = Helper.setTranstype("Deposit");
-  const newBalance = celoUserWallet.balance + params.amount;
-  const data = {
-    transID: transID,
-    username: params.username,
-    account: params.account,
-    amount: params.amount,
-    balance: newBalance,
-    transType: "Deposit",
-    accountType: "MPESA"
-  };
-  return WalletQueries.updateUserWalletLogs(data);
+  // const newBalance = celoUserWallet.balance + params.amount;
+  // const data = {
+  //   transID: transID,
+  //   username: params.username,
+  //   account: params.account,
+  //   amount: params.amount,
+  //   balance: newBalance,
+  //   transType: "Deposit",
+  //   accountType: "MPESA"
+  // };
+  // return WalletQueries.updateUserWalletLogs(data);
 }
 
 async function withdrawFunds(params) {
@@ -28,29 +30,29 @@ async function withdrawFunds(params) {
   const balance = celoUserWallet.balance;
   if (balance < params.amount) return "Account has Insufficient balance";
 
-  const newBalance = celoUserWallet.balance - params.amount;
-  const transID = Helper.setTranstype(body.transType);
-  const data = {
-    transID: transID,
-    username: params.username,
-    account: params.account,
-    amount: params.amount,
-    balance: newBalance,
-    transType: "Withdraw",
-    accountType: "MPESA"
-  };
-  return WalletQueries.updateUserWalletLogs(data);
+  // const newBalance = celoUserWallet.balance - params.amount;
+  // const transID = Helper.setTranstype(body.transType);
+  // const data = {
+  //   transID: transID,
+  //   username: params.username,
+  //   account: params.account,
+  //   amount: params.amount,
+  //   balance: newBalance,
+  //   transType: "Withdraw",
+  //   accountType: "MPESA"
+  // };
+  // return WalletQueries.updateUserWalletLogs(data);
 }
 
 async function transferFunds(params) {
   const recipient = params.to;
   const amount = params.amount;
   const token = params.token;
-  const account = params.phoneNumber;
+  const identity = params.phoneNumber;
   console.log(`Sending payment of ${amount} ${token} to ${recipient}`);
 
   //check if user Account has enough funds
-  const celoUserWallet = await WalletQueries.fetchUserWallet(account);
+  const celoUserWallet = await WalletQueries.fetchUserWallet(identity);
   const balance = celoUserWallet.balance;
   if (balance < amount) return "Account has Insufficient balance";
 
@@ -93,18 +95,18 @@ async function transferFunds(params) {
   console.log(`New balance is ${newBalance.toString()}`);
   kit.stop();
 
-  const newBalance = celoUserWallet.balance - params.amount;
-  const transID = Helper.setTranstype("Transfer");
-  const data = {
-    transID: transID,
-    username: params.username,
-    account: recipient,
-    amount: params.amount,
-    balance: newBalance,
-    transType: "Transfer",
-    accountType: "cUSD"
-  };
-  WalletQueries.updateUserWalletLogs(data);
+  // const newBalance = celoUserWallet.balance - params.amount;
+  // const transID = Helper.setTranstype("Transfer");
+  // const data = {
+  //   transID: transID,
+  //   username: params.username,
+  //   account: recipient,
+  //   amount: params.amount,
+  //   balance: newBalance,
+  //   transType: "Transfer",
+  //   accountType: "cUSD"
+  // };
+  // WalletQueries.updateUserWalletLogs(data);
 
   return {
     hash: hash,
@@ -120,3 +122,31 @@ module.exports = {
   withdrawFunds,
   depositFunds
 };
+
+
+/*
+ * ACCOUNTING SCRIPT
+ * DEPOSIT -> WE CREATE A CELO_USER_WALLET
+ * STORES INFO OF THE USER.
+ *
+ * USERNAME      | AMOUNT    | CREATEDDATE   | ACCOUNT
+ * Account_owner    1000        12-09-2020      "username"    {username / phone / wallet_address}
+ *
+ *
+ * DEPOSIT -> WE CREATE A CELO_USER_WALLET_LOGS
+ * STORES INFO OF THE TRANSACTION.
+ *
+ * TRANSID | ACCOUNT TYPE | TRANSTYPE | AMOUNT | BALANCE  | TIMESTAMP    | USERNAME       |    ACCOUNT
+ * 0001        MPESA        Deposit      1000      1000      12-09-2020     Account_owner          "username"    {username / phone / wallet_address}
+ *
+ *
+ *TRANSFER -> CELO_USER_WALLET_LOGS
+ *
+ * TRANSID |  ACCOUNT TYPE | TRANSTYPE | AMOUNT | BALANCE |TIMESTAMP    | USERNAME        | ACCOUNT
+ * 0001         cUSD          Transfer    1000       0      12-09-2020    Account_owner          "wallet_address"
+ *
+ *WITHDRAWAL -> CELO_USER_WALLET_LOGS
+ *
+ * TRANSID |  ACCOUNT TYPE | TRANSTYPE  | AMOUNT | BALANCE |TIMESTAMP    | USERNAME        | ACCOUNT
+ * 0001         MPESA         Withdrwal    1000       0      12-09-2020    Account_owner          "phone"
+ */
