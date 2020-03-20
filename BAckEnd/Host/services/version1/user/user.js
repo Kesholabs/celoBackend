@@ -3,6 +3,8 @@ const web3 = require("web3");
 const fs = require("fs");
 const web3Instance = new web3();
 
+
+// api/v1/user/register
 const register = async (req,res,next) => {
    const identity = req.body.phoneNumber
    if (fs.existsSync(identity)) {
@@ -18,21 +20,17 @@ const register = async (req,res,next) => {
         fs.writeFileSync(identity, account.privateKey);
         console.log(`Account private key saved to ${identity}`);
         
-            if(!account){
-                throw new error()
+        if(!account){
+            throw new error()
+        }
+        res.status(200).json({
+            Message:"success",
+            details:{
+                "message":"success",
+                "Account address":account.address
             }
-            res.status(200).json({
-                Message:"success",
-                details:{
-                    "message":"success",
-                    "Account address":account.address
-                }
-            })
-            
-       
-
-       
-        
+        })
+         
     } catch (error) {
         console.log(error)
         return res.status(500).json(
@@ -45,7 +43,7 @@ const register = async (req,res,next) => {
     }
 }
 
-
+// api/v1/user/getAddress
 
 module.exports = ({
     register:register,
