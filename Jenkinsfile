@@ -9,7 +9,7 @@ pipeline {
 				sh '''
 				sudo su - celo
 				cd /home/celo/celoBackend
-				sudo git pull https://github.com/Kesholabs/pesabase-react.git
+				sudo git pull https://github.com/Kesholabs/celoBackend.git
 				'''
 			}
 		}
