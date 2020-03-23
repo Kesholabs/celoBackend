@@ -52,11 +52,14 @@ async function getBalances(identity, localCurrency) {
   // Read Rates File
   try {
     console.log("Currency", localCurrency);
-    console.log("Currency %j", ratesJson["rates"][localCurrency]);
 
-    if (!ratesJson.ratesJson['rates'][localCurrency])
+    if (!ratesJson["rates"][localCurrency])
       return `No Currency with the following Symbol ${localCurrency}`;
 
+    if (localCurrency === "USD")
+      return { usd: balances.usd, local_Currency: `${balances.usd}` };
+
+    console.log("Currency rate", ratesJson["rates"][localCurrency]);
     console.log(`Currency convertion from USD to ${localCurrency}`);
     console.log(
       `Currency Converted ${balances.usd * ratesJson["rates"][localCurrency]}`

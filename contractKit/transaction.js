@@ -4,9 +4,6 @@ const kit = contractkit.newKit(NODE_URL);
 const Helper = require("../helper/helper");
 const logger = Helper.getLogger("CELO_TRANSACTION_METHODS");
 const accounts = require("./account");
-// const WalletQueries = require("../scripts/walletQueries");
-
-const MAIN_ACCOUNT = "process.env.MAIN_ACCOUNT";
 
 async function depositFunds(params) {
   console.log("\n================ DEPOSIT FUNDS=================\n");
@@ -25,23 +22,43 @@ async function depositFunds(params) {
 
 async function withdrawFunds(params) {
   console.log("\n================ WITHDRAW =================\n");
-  if (balance < params.amount) return "Account has Insufficient balance";
+  const identity = params.account;
+  const amount = params.amount;
+
+  const ownWallet = await accounts.getAccount(identity).address;
+  const walletAddress = await accounts.getAccount("MAIN_ACCOUNT").address;
+  const data = {
+    account: identity,
+    ownAdress: ownWallet,
+    recipient: walletAddress,
+    amount: amount,
+    type: "Withdraw"
+  };
+  return transferFunds(data);
 }
 
 async function transferFunds(params) {
   console.log("\n================ TRANSFER FUNDS=================\n");
   const identity = params.account;
+  const ownAdress = params.ownAdress;
   const amount = params.amount;
   const recipient = params.recipient;
-  const type = params.type;
+  const type = params.type || "Transfer";
 
   switch (type) {
     case "Deposit":
       console.log(`${type} payment of ${amount} to ${identity} : ${recipient}`);
       return buyIn(recipient, amount, identity);
     case "Withdraw":
-      console.log(`${type} payment of ${amount} to ${identity} : ${recipient}`);
-      return buyOut(recipient, amount);
+      console.log(
+        `${type} payment of ${amount} from ${identity} : ${ownAdress}`
+      );
+      return buyOut(recipient, amount, identity);
+    case "Transfer":
+      console.log(
+        `${type} payment of ${amount} from ${identity} : ${recipient}`
+      );
+      return send(recipient, amount, identity);
     default:
       console.log(`${type} payment of ${amount} to ${identity} : ${recipient}`);
       return "Invalid transaction type";
@@ -50,59 +67,47 @@ async function transferFunds(params) {
 
 async function buyIn(recipient, amount, identity) {
   logger.info("Buyin Method");
-  // Set up your account in contract kit
-  const MainAccountAddress = await accounts.getAccount(identity).address;
-  if (!MainAccountAddress) return "Error no account found";
-
-  //check if main account has enough funds
-  // const organizationBalance = await accounts.getBalances(identity);
-  // if (amount > organizationBalance)
-  //   return `Main Account has insufficient Funds ${organizationBalance} to send amount ${amount}`;
-
-  // Get the right token contract
-  let contract = await kit.contracts.getStableToken(); //set stable token as cUSD
-  const organizationBalance = await contract.balanceOf(MainAccountAddress);
-
-  logger.info(`MAIN ACCOUNT BALANCE ${organizationBalance}`);
-
-  if (amount > organizationBalance)
-    return `Main Account has insufficient Funds ${organizationBalance} to send amount ${amount}`;
-
-  console.log("Kit contract is set up, creating transaction");
-  return process(recipient, amount, MainAccountAddress, contract);
+  return process(recipient, amount, identity);
 }
 
 async function buyOut(recipient, amount, identity) {
+  logger.info("BuyOut Method");
+  return process(recipient, amount, identity);
+}
+
+async function send(recipient, amount, identity) {
+  logger.info("Send Method");
+  const recipientWallet = await accounts.getAccount(recipient).address;
+  return process(recipientWallet, amount, identity);
+}
+
+async function process(recipient, amount, identity) {
+  logger.info("PROCESSING TRANSACTION");
+  console.log(
+    "transer funds cUSD %s.......from %s to %s ",
+    amount,
+    identity,
+    recipient
+  );
+
   // Set up your account in contract kit
-  const AccountOwnerWallet = await accounts.getAccount(identity).address;
-
-  //check if main account has enough funds
-  // const AccountOwnerWalletBalance = await accounts.getBalances(
-  //   AccountOwnerWallet
-  // );
-  // if (amount > AccountOwnerWalletBalance)
-  //   return `User Account has insufficient Funds ${AccountOwnerWalletBalance} to send amount ${amount}`;
-
+  const account = await accounts.getAccount(identity);
+  kit.addAccount(account.privateKey);
+  kit.defaultAccount = account.address;
+  console.log("Kit contract is set up, creating transaction");
 
   // Get the right token contract
   let contract = await kit.contracts.getStableToken(); //set stable token as cUSD
-  const AccountOwnerWalletBalance = await contract.balanceOf(AccountOwnerWallet);
+  
+  //check if account has enough funds
+  const walletBalance = await contract.balanceOf(account.address);
+  logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
 
-  logger.info(`WALLET ACCOUNT BALANCE ${AccountOwnerWalletBalance}`);
+  if (amount > walletBalance)
+    return `Main Account has insufficient Funds ${walletBalance} to send amount ${amount}`;
 
-  if (amount > AccountOwnerWalletBalance)
-    return `Main Account has insufficient Funds ${AccountOwnerWalletBalance} to send amount ${amount}`;
-
-  console.log("Kit contract is set up, creating transaction");
-  return process(recipient, amount, AccountOwnerWallet, contract);
-}
-
-async function process(recipient, amount, from, contract) {
-  logger.info("PROCESSING ");
-  // paid gas in cUSD
-  await kit.setFeeCurrency(contractkit.StableToken);
   // Create the payment transaction
-  const tx = await contract.transfer(recipient, amount).send({ from: from });
+  const tx = await contract.transfer(recipient, amount).send();
 
   const hash = await tx.getHash();
   console.log("Hash receipt recieved", hash);

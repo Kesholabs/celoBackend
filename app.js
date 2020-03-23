@@ -8,7 +8,7 @@ var logger = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./Docs/swaggerConfig");
 
-const service = require("./service/exchangeRate");
+// const service = require("./service/exchangeRate");
 
 var account = require("./routes/accounts");
 var transaction = require("./routes/transaction");
