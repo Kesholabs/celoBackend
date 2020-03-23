@@ -8,7 +8,7 @@ pipeline {
 			steps {
 				sh '''
 				sudo su - celo
-				cd ~/celoBackend
+				cd /home/celo/celoBackend
 				sudo git pull https://github.com/Kesholabs/pesabase-react.git
 				'''
 			}
@@ -17,7 +17,7 @@ pipeline {
 			steps {
 				sh '''
 				sudo su - celo
-				cd ~/celoBackend
+				cd /home/celo/celoBackend
 				sudo yarn
 				'''
 			}
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 sh '''
                 sudo su - pb-frontend-slave
-                cd ~/celoBackend
+                cd /home/celo/celoBackend
                 pm2 start app.js --watch
                 '''
             }
