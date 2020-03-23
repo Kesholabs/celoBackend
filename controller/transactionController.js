@@ -5,7 +5,7 @@ const contractKit = require("../contractKit/transaction");
 
 module.exports = {
   deposit: async (req, res, next) => {
-    logger.info("\n=================== DEPOSIT ====================\n");
+    logger.info("\n=================== DEPOSIT CONTROLLER ====================\n");
     const params = req.body;
     const address = await contractKit.depositFunds(params);
     const msg = await Helper.getSuccessMessage(address);
@@ -13,7 +13,7 @@ module.exports = {
   },
 
   withdraw: async (req, res, next) => {
-    logger.info("\n=================== WITHDRAW ====================\n");
+    logger.info("\n=================== WITHDRAW CONTROLLER ====================\n");
     const params = req.body;
     const address = await contractKit.withdrawFunds(params);
     const msg = await Helper.getSuccessMessage(address);
@@ -21,7 +21,7 @@ module.exports = {
   },
 
   transfer: async (req, res, next) => {
-    logger.info("\n=================== TRANSFER ====================\n");
+    logger.info("\n=================== TRANSFER CONTROLLER ====================\n");
     const params = req.body;
     const addressBalance = await contractKit.transferFunds(params);
     const msg = await Helper.getSuccessMessage(addressBalance);

@@ -5,7 +5,7 @@ const contractkit = require("@celo/contractkit");
 const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE THIS TO OUR NODE ADDRESS
 const kit = contractkit.newKit(NODE_URL);
 
-const SECRET_PATH = ".secret";
+const ratesJson = require(__dirname + "./../exchangeRates.json");
 
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
@@ -36,11 +36,10 @@ function getAccount(identity) {
   return account;
 }
 
-
 /**
  * TODO: FETCH WALLET BALANCE
  */
-async function getBalances(identity) {
+async function getBalances(identity, localCurrency) {
   console.log("Getting your balances");
   const address = getAccount(identity).address;
   if (!address) return "Invalid identity or no account exists";
@@ -49,7 +48,26 @@ async function getBalances(identity) {
   console.log(`Dollar balance: ${balances.usd}`);
   console.log(`Gold balance: ${balances.gold}`);
   kit.stop();
-  return balances.usd;
+
+  // Read Rates File
+  try {
+    console.log("Currency", localCurrency);
+    console.log("Currency %j", ratesJson["rates"][localCurrency]);
+
+    if (!ratesJson.ratesJson['rates'][localCurrency])
+      return `No Currency with the following Symbol ${localCurrency}`;
+
+    console.log(`Currency convertion from USD to ${localCurrency}`);
+    console.log(
+      `Currency Converted ${balances.usd * ratesJson["rates"][localCurrency]}`
+    );
+    return {
+      usd: balances.usd,
+      local_Currency: `${balances.usd * ratesJson["rates"][localCurrency]}`
+    };
+  } catch (err) {
+    console.log("Error parsing JSON string:", err);
+  }
 }
 
 // createAccount("070034567")

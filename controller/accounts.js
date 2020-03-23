@@ -29,7 +29,8 @@ module.exports = {
       "\n=================== GET WALLET BALANCE ====================\n"
     );
     const account = req.body.account;
-    const addressBalance = await contractKit.getBalances(account);
+    const localCurrency = req.body.currency;
+    const addressBalance = await contractKit.getBalances(account, localCurrency);
     const msg = await Helper.getSuccessMessage(addressBalance);
     return res.send(msg);
   }
