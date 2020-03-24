@@ -9,7 +9,7 @@
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {
-    "@celo/contractkit": "^0.3.0",
+    "@celo/contractkit": "^0.2.14",
     "axios": "^0.19.2",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",

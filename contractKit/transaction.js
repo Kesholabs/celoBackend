@@ -98,16 +98,29 @@ async function process(recipient, amount, identity) {
 
   // Get the right token contract
   let contract = await kit.contracts.getStableToken(); //set stable token as cUSD
-  
+
   //check if account has enough funds
   const walletBalance = await contract.balanceOf(account.address);
   logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
 
   if (amount > walletBalance)
-    return `Main Account has insufficient Funds ${walletBalance} to send amount ${amount}`;
+    return `${identity} Account has insufficient Funds ${walletBalance} to send amount ${amount}`;
 
   // Create the payment transaction
+  // method:1
   const tx = await contract.transfer(recipient, amount).send();
+
+  // method:2
+  // const tx = await kit.sendTransaction({
+  //   from: account.address,
+  //   to: recipient,
+  //   value: amount,
+  // });
+
+  // method:3
+  // const tx = await contract.transfer(recipient, amount).send({
+  //   from: account.address
+  // });
 
   const hash = await tx.getHash();
   console.log("Hash receipt recieved", hash);
@@ -130,6 +143,7 @@ async function process(recipient, amount, identity) {
     walletBalance: newBalance
   };
 }
+
 
 module.exports = {
   transferFunds,
