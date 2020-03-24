@@ -25,5 +25,8 @@
 
 # Run
 1. git clone https://github.com/Kesholabs/celoBackend.git.
+2. cd celoBackend
+3. yarn or npm i
+4. yarn start or npm start
 
 # CMD - Command Line Interface
