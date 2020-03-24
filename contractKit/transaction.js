@@ -93,7 +93,7 @@ async function process(recipient, amount, identity) {
   // Set up your account in contract kit
   const account = await accounts.getAccount(identity);
   kit.addAccount(account.privateKey);
-  kit.defaultAccount = account.address;
+  // kit.defaultAccount = account.address;
   console.log("Kit contract is set up, creating transaction");
 
   // Get the right token contract
@@ -108,7 +108,7 @@ async function process(recipient, amount, identity) {
 
   // Create the payment transaction
   // method:1
-  const tx = await contract.transfer(recipient, amount).send();
+  // const tx = await contract.transfer(recipient, amount).send();
 
   // method:2
   // const tx = await kit.sendTransaction({
@@ -118,16 +118,16 @@ async function process(recipient, amount, identity) {
   // });
 
   // method:3
-  // const tx = await contract.transfer(recipient, amount).send({
-  //   from: account.address
-  // });
+  const tx = await contract.transfer(recipient, amount).send({
+    from: account.address
+  });
 
   const hash = await tx.getHash();
   console.log("Hash receipt recieved", hash);
   const receipt = await tx.waitReceipt();
   console.log("Tx receipt recieved", receipt);
 
-  const newOrganizationBalance = await contract.balanceOf(from);
+  const newOrganizationBalance = await contract.balanceOf(account.address);
   const newBalance = await contract.balanceOf(recipient);
   console.log(`New Receipt balance is ${newBalance.toString()}`);
   console.log(
@@ -143,7 +143,6 @@ async function process(recipient, amount, identity) {
     walletBalance: newBalance
   };
 }
-
 
 module.exports = {
   transferFunds,
