@@ -11,19 +11,28 @@
 4. Basic understanding of blockchain.
 
 # Workings
- create account
+### create account
 
- fetch account
+### fetch account
 
- fetch balance
+### fetch balance
 
- deposit funds
+### deposit funds
 
- withdraw funds
+### withdraw funds
 
- transfer funds
+### transfer funds
 
 # Run
 1. git clone https://github.com/Kesholabs/celoBackend.git.
+2. cd celoBackend
+3. yarn or npm i
+4. yarn start or npm start
+
+# Live Test
+  Try out all the available endpoint live. http://34.83.118.99:2030/api-docs/#/
 
 # CMD - Command Line Interface
+
+### Author
+
