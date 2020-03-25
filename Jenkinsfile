@@ -23,15 +23,6 @@ pipeline {
 			}
 		}
     
-        stage('SERVING THE BUILD FOLDER') {
-            steps {
-                sh '''
-                sudo su - pb-frontend-slave
-                cd /home/celo/celoBackend
-                pm2 start app.js -- watch
-                '''
-            }
-
-}
+ 
 		}
 }
