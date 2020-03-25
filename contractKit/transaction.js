@@ -9,7 +9,7 @@ async function depositFunds(params) {
   console.log("\n================ DEPOSIT FUNDS=================\n");
   const identity = params.account;
   const amount = params.amount;
-  const currency = params.currency
+  const currency = params.currency;
 
   const walletAddress = await accounts.getAccount(identity).address;
   const data = {
@@ -46,7 +46,8 @@ async function transferFunds(params) {
   const identity = params.account;
   const ownAdress = params.ownAdress;
   const currency = params.currency;
-  const amount = await accounts.currencyConvertion(currency, params.amount).local_Currency;
+  const amount = await accounts.currencyConvertion(currency, params.amount)
+    .local_Currency; //TODO: CURRENCY IN WORLD CURRENCY
   const recipient = params.recipient;
   const type = params.type || "Transfer";
 
@@ -99,7 +100,7 @@ async function process(recipient, amount, identity) {
   const account = await accounts.getAccount(identity);
   kit.addAccount(account.privateKey);
   // kit.defaultAccount = account.address;
-  await kit.setFeeCurrency(contractkit.CeloContract.StableToken)
+  await kit.setFeeCurrency(contractkit.CeloContract.StableToken);
   console.log("Kit contract is set up, creating transaction");
 
   // Get the right token contract
@@ -124,7 +125,8 @@ async function process(recipient, amount, identity) {
   // });
 
   // method:3
-  const tx = await contract.transfer(recipient, amount).send({
+  const amountInWei = await kit.web3.utils.toWei(amount.toString(), "ether"); //TODO: CONVERT TO USEABLE CURRENCY WEI
+  const tx = await contract.transfer(recipient, amountInWei).send({
     from: account.address,
     gasPrice: 10000000000
   });
@@ -141,6 +143,8 @@ async function process(recipient, amount, identity) {
     `New Oganization balance is ${newOrganizationBalance.toString()}`
   );
   kit.stop();
+
+  //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
 
   return {
     hash: hash,

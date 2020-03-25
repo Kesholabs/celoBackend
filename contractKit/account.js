@@ -48,15 +48,15 @@ async function getBalances(identity, localCurrency) {
   // const balances = await web3.eth.getBalance(address)
 
   const balances = await kit.getTotalBalance(address);
-  console.log(typeof balances.usd);
-  console.log(web33.utils.fromWei(balances.usd, "ether"));
-  const local = await currencyConvertion(localCurrency, balances.total);
+  const balanceUSD = await kit.web3.utils.fromWei(balances.usd.toString(), "ether") ;
+  console.log("balance ", balanceUSD);
+  const local = await currencyConvertion(localCurrency, balanceUSD); //TODO: CURRENCY IN DOLLARS, CONVERT TO ANY OTHER CURRENCY
   console.log(`${localCurrency} balance: ${local.local_Currency}`);
-  console.log(`Dollar balance: ${balances.usd}`);
-  console.log(`Gold balance: ${balances.gold}`);
+  console.log(`Dollar balance: ${balanceUSD}`);
+  // console.log(`Gold balance: ${balances.gold}`);
   // kit.stop();
   return {
-    usd: balances.usd,
+    usd: balanceUSD,
     local: local.local_Currency
   };
 }
