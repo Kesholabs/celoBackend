@@ -29,6 +29,7 @@ pipeline {
 				sudo su - celo
 				cd /home/celo/celoBackend
 				sudo pm2 restart app
+                                echo "done"
 				'''
 			}
 		}
