@@ -16,6 +16,7 @@ async function depositFunds(params) {
     account: "MAIN_ACCOUNT",
     recipient: walletAddress,
     amount: amount,
+    currency: currency,
     type: "Deposit"
   };
   return transferFunds(data);
@@ -25,6 +26,7 @@ async function withdrawFunds(params) {
   console.log("\n================ WITHDRAW =================\n");
   const identity = params.account;
   const amount = params.amount;
+  const currency = params.currency;
 
   const ownWallet = await accounts.getAccount(identity).address;
   const walletAddress = await accounts.getAccount("MAIN_ACCOUNT").address;
@@ -33,6 +35,7 @@ async function withdrawFunds(params) {
     ownAdress: ownWallet,
     recipient: walletAddress,
     amount: amount,
+    currency: currency,
     type: "Withdraw"
   };
   return transferFunds(data);
@@ -42,7 +45,8 @@ async function transferFunds(params) {
   console.log("\n================ TRANSFER FUNDS=================\n");
   const identity = params.account;
   const ownAdress = params.ownAdress;
-  const amount = params.amount;
+  const currency = params.currency;
+  const amount = await accounts.currencyConvertion(currency, params.amount).local_Currency;
   const recipient = params.recipient;
   const type = params.type || "Transfer";
 
@@ -57,7 +61,7 @@ async function transferFunds(params) {
       return buyOut(recipient, amount, identity);
     case "Transfer":
       console.log(
-        `${type} payment of ${amount} from ${identity} : ${recipient}`
+        `${type} payment of ${amount} from ${identity} to ${recipient}`
       );
       return send(recipient, amount, identity);
     default:
@@ -95,6 +99,7 @@ async function process(recipient, amount, identity) {
   const account = await accounts.getAccount(identity);
   kit.addAccount(account.privateKey);
   // kit.defaultAccount = account.address;
+  await kit.setFeeCurrency(contractkit.CeloContract.StableToken)
   console.log("Kit contract is set up, creating transaction");
 
   // Get the right token contract
@@ -104,7 +109,7 @@ async function process(recipient, amount, identity) {
   const walletBalance = await contract.balanceOf(account.address);
   logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
 
-  if (amount > walletBalance)
+  if (parseFloat(amount) > parseFloat(walletBalance))
     return `${identity} Account has insufficient Funds ${walletBalance} to send amount ${amount}`;
 
   // Create the payment transaction
@@ -120,7 +125,8 @@ async function process(recipient, amount, identity) {
 
   // method:3
   const tx = await contract.transfer(recipient, amount).send({
-    from: account.address
+    from: account.address,
+    gasPrice: 10000000000
   });
 
   const hash = await tx.getHash();

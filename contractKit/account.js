@@ -44,36 +44,44 @@ async function getBalances(identity, localCurrency) {
   const address = getAccount(identity).address;
   if (!address) return "Invalid identity or no account exists";
 
+  const web33 = kit.web3;
+  // const balances = await web3.eth.getBalance(address)
+
   const balances = await kit.getTotalBalance(address);
-  const local = await currencyConvertion(localCurrency, balances);
+  console.log(typeof balances.usd);
+  console.log(web33.utils.fromWei(balances.usd, "ether"));
+  const local = await currencyConvertion(localCurrency, balances.total);
   console.log(`${localCurrency} balance: ${local.local_Currency}`);
   console.log(`Dollar balance: ${balances.usd}`);
   console.log(`Gold balance: ${balances.gold}`);
-  kit.stop();
-
-  // Read Rates File
-  try {
-  } catch (err) {
-    console.log("Error parsing JSON string:", err);
-  }
+  // kit.stop();
+  return {
+    usd: balances.usd,
+    local: local.local_Currency
+  };
 }
 
 function currencyConvertion(localCurrency, balances) {
-  console.log("Currency", localCurrency);
+  console.log("Currency %s and amount %s", localCurrency, balances);
+  try {
+    if (!ratesJson["rates"][localCurrency])
+      return {
+        local_Currency: `No Currency with the following Symbol ${localCurrency}`
+      };
 
-  if (!ratesJson["rates"][localCurrency])
-    return `No Currency with the following Symbol ${localCurrency}`;
+    if (localCurrency === "USD") return { local_Currency: `${balances}` };
 
-  if (localCurrency === "USD") return { local_Currency: `${balances.usd}` };
-
-  console.log(`Currency rate, ${ratesJson["rates"][localCurrency]}`);
-  console.log(`Currency convertion from USD to ${localCurrency}`);
-  console.log(
-    `Currency Converted ${balances.usd * ratesJson["rates"][localCurrency]}`
-  );
-  return {
-    local_Currency: `${balances.usd * ratesJson["rates"][localCurrency]}`
-  };
+    console.log(`Currency rate, ${ratesJson["rates"][localCurrency]}`);
+    console.log(`Currency convertion from USD to ${localCurrency}`);
+    console.log(
+      `Currency Converted ${balances * ratesJson["rates"][localCurrency]}`
+    );
+    return {
+      local_Currency: `${balances * ratesJson["rates"][localCurrency]}`
+    };
+  } catch (err) {
+    console.error("Error parsing JSON string:", err);
+  }
 }
 
 // createAccount("070034567")
@@ -83,5 +91,6 @@ function currencyConvertion(localCurrency, balances) {
 module.exports = {
   createAccount,
   getAccount,
-  getBalances
+  getBalances,
+  currencyConvertion
 };
