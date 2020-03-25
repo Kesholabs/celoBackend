@@ -5,7 +5,7 @@ const contractkit = require("@celo/contractkit");
 const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE THIS TO OUR NODE ADDRESS
 const kit = contractkit.newKit(NODE_URL);
 
-const SECRET_PATH = ".secret";
+const ratesJson = require(__dirname + "./../exchangeRates.json");
 
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
@@ -36,20 +36,52 @@ function getAccount(identity) {
   return account;
 }
 
-
 /**
  * TODO: FETCH WALLET BALANCE
  */
-async function getBalances(identity) {
+async function getBalances(identity, localCurrency) {
   console.log("Getting your balances");
   const address = getAccount(identity).address;
   if (!address) return "Invalid identity or no account exists";
 
+  const web33 = kit.web3;
+  // const balances = await web3.eth.getBalance(address)
+
   const balances = await kit.getTotalBalance(address);
-  console.log(`Dollar balance: ${balances.usd}`);
-  console.log(`Gold balance: ${balances.gold}`);
-  kit.stop();
-  return balances.usd;
+  const balanceUSD = await kit.web3.utils.fromWei(balances.usd.toString(), "ether") ;
+  console.log("balance ", balanceUSD);
+  const local = await currencyConvertion(localCurrency, balanceUSD); //TODO: CURRENCY IN DOLLARS, CONVERT TO ANY OTHER CURRENCY
+  console.log(`${localCurrency} balance: ${local.local_Currency}`);
+  console.log(`Dollar balance: ${balanceUSD}`);
+  // console.log(`Gold balance: ${balances.gold}`);
+  // kit.stop();
+  return {
+    usd: balanceUSD,
+    local: local.local_Currency
+  };
+}
+
+function currencyConvertion(localCurrency, balances) {
+  console.log("Currency %s and amount %s", localCurrency, balances);
+  try {
+    if (!ratesJson["rates"][localCurrency])
+      return {
+        local_Currency: `No Currency with the following Symbol ${localCurrency}`
+      };
+
+    if (localCurrency === "USD") return { local_Currency: `${balances}` };
+
+    console.log(`Currency rate, ${ratesJson["rates"][localCurrency]}`);
+    console.log(`Currency convertion from USD to ${localCurrency}`);
+    console.log(
+      `Currency Converted ${balances * ratesJson["rates"][localCurrency]}`
+    );
+    return {
+      local_Currency: `${balances * ratesJson["rates"][localCurrency]}`
+    };
+  } catch (err) {
+    console.error("Error parsing JSON string:", err);
+  }
 }
 
 // createAccount("070034567")
@@ -59,5 +91,6 @@ async function getBalances(identity) {
 module.exports = {
   createAccount,
   getAccount,
-  getBalances
+  getBalances,
+  currencyConvertion
 };

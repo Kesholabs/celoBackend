@@ -13,6 +13,10 @@ const Controller = require("../controller/accounts");
  *     properties:
  *       account:
  *         type: string
+ *         example: username or email or phonenumber
+ *       currency:
+ *          type: string
+ *          example: <Optional> USD, GB, KES
  *
  *   ApiModel:
  *     type: object
