@@ -6,4 +6,5 @@ let Router = express.Router()
 
 Router.use('/register', usrService.register)
 
+
 module.exports = Router

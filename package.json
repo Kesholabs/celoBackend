@@ -14,6 +14,7 @@
     "express": "~4.16.1",
     "jest": "^25.1.0",
     "mongoose": "^5.9.5",
+    "swagger-ui-express": "^4.1.4",
     "web3": "^1.2.6",
     "yargs": "^15.3.1"
   }
