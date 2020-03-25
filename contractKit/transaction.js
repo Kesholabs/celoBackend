@@ -9,6 +9,7 @@ async function depositFunds(params) {
   console.log("\n================ DEPOSIT FUNDS=================\n");
   const identity = params.account;
   const amount = params.amount;
+  const currency = params.currency
 
   const walletAddress = await accounts.getAccount(identity).address;
   const data = {

@@ -45,32 +45,35 @@ async function getBalances(identity, localCurrency) {
   if (!address) return "Invalid identity or no account exists";
 
   const balances = await kit.getTotalBalance(address);
+  const local = await currencyConvertion(localCurrency, balances);
+  console.log(`${localCurrency} balance: ${local.local_Currency}`);
   console.log(`Dollar balance: ${balances.usd}`);
   console.log(`Gold balance: ${balances.gold}`);
   kit.stop();
 
   // Read Rates File
   try {
-    console.log("Currency", localCurrency);
-
-    if (!ratesJson["rates"][localCurrency])
-      return `No Currency with the following Symbol ${localCurrency}`;
-
-    if (localCurrency === "USD")
-      return { usd: balances.usd, local_Currency: `${balances.usd}` };
-
-    console.log("Currency rate", ratesJson["rates"][localCurrency]);
-    console.log(`Currency convertion from USD to ${localCurrency}`);
-    console.log(
-      `Currency Converted ${balances.usd * ratesJson["rates"][localCurrency]}`
-    );
-    return {
-      usd: balances.usd,
-      local_Currency: `${balances.usd * ratesJson["rates"][localCurrency]}`
-    };
   } catch (err) {
     console.log("Error parsing JSON string:", err);
   }
+}
+
+function currencyConvertion(localCurrency, balances) {
+  console.log("Currency", localCurrency);
+
+  if (!ratesJson["rates"][localCurrency])
+    return `No Currency with the following Symbol ${localCurrency}`;
+
+  if (localCurrency === "USD") return { local_Currency: `${balances.usd}` };
+
+  console.log(`Currency rate, ${ratesJson["rates"][localCurrency]}`);
+  console.log(`Currency convertion from USD to ${localCurrency}`);
+  console.log(
+    `Currency Converted ${balances.usd * ratesJson["rates"][localCurrency]}`
+  );
+  return {
+    local_Currency: `${balances.usd * ratesJson["rates"][localCurrency]}`
+  };
 }
 
 // createAccount("070034567")

@@ -17,6 +17,9 @@ const Controller = require("../controller/transactionController");
  *       amount:
  *          type: string
  *          example: 100
+ *       currency:
+ *          type: string
+ *          example: <Optional> USD, GB, KES
  *       recipient:
  *          type: string
  *          example: <Optional!> username or phonenumber 
