@@ -28,7 +28,7 @@ pipeline {
                 sh '''
                 sudo su - pb-frontend-slave
                 cd /home/celo/celoBackend
-                pm2 start app.js --watch
+                pm2 start app.js -- watch
                 '''
             }
 
