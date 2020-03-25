@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "yarn start",
-    "start": "NODE_ENV=development nodemon app.js",
-    "prod": "NODE_ENV=production nodemon app.js",
+    "start": "NODE_ENV=development node app.js",
+    "prod": "NODE_ENV=production node app.js",
     "test": "NODE_ENV=test jest"
   },
   "dependencies": {
@@ -14,7 +14,9 @@
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
-    "express": "~4.16.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "global": "^4.4.0",
     "log4js": "^4.1.0",
     "mongoose": "^5.9.5",
     "morgan": "~1.8.1",
