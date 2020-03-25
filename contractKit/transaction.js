@@ -142,7 +142,7 @@ async function process(recipient, amount, identity) {
   console.log(
     `New Oganization balance is ${newOrganizationBalance.toString()}`
   );
-  kit.stop();
+  // kit.stop();
 
   //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
 
