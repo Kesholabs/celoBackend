@@ -47,7 +47,7 @@ async function transferFunds(params) {
   const ownAdress = params.ownAdress;
   const currency = params.currency;
   const amount = await accounts.currencyConvertion(currency, params.amount)
-    .local_Currency; //TODO: CURRENCY IN WORLD CURRENCY
+    .cUsd; //TODO: CURRENCY IN WORLD CURRENCY
   const recipient = params.recipient;
   const type = params.type || "Transfer";
 
@@ -96,63 +96,67 @@ async function process(recipient, amount, identity) {
     recipient
   );
 
-  // Set up your account in contract kit
-  const account = await accounts.getAccount(identity);
-  kit.addAccount(account.privateKey);
-  // kit.defaultAccount = account.address;
-  await kit.setFeeCurrency(contractkit.CeloContract.StableToken);
-  console.log("Kit contract is set up, creating transaction");
+  try {
+    // Set up your account in contract kit
+    const account = await accounts.getAccount(identity);
+    kit.addAccount(account.privateKey);
+    // kit.defaultAccount = account.address;
+    await kit.setFeeCurrency(contractkit.CeloContract.StableToken);
+    console.log("Kit contract is set up, creating transaction");
 
-  // Get the right token contract
-  let contract = await kit.contracts.getStableToken(); //set stable token as cUSD
+    // Get the right token contract
+    let contract = await kit.contracts.getStableToken(); //set stable token as cUSD
 
-  //check if account has enough funds
-  const walletBalance = await contract.balanceOf(account.address);
-  logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
+    //check if account has enough funds
+    const walletBalance = await contract.balanceOf(account.address);
+    logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
 
-  if (parseFloat(amount) > parseFloat(walletBalance))
-    return `${identity} Account has insufficient Funds ${walletBalance} to send amount ${amount}`;
+    if (parseFloat(amount) > parseFloat(walletBalance))
+      return `${identity} Account has insufficient Funds ${walletBalance} to send amount ${amount}`;
 
-  // Create the payment transaction
-  // method:1
-  // const tx = await contract.transfer(recipient, amount).send();
+    // Create the payment transaction
+    // method:1
+    // const tx = await contract.transfer(recipient, amount).send();
 
-  // method:2
-  // const tx = await kit.sendTransaction({
-  //   from: account.address,
-  //   to: recipient,
-  //   value: amount,
-  // });
+    // method:2
+    // const tx = await kit.sendTransaction({
+    //   from: account.address,
+    //   to: recipient,
+    //   value: amount,
+    // });
 
-  // method:3
-  const amountInWei = await kit.web3.utils.toWei(amount.toString(), "ether"); //TODO: CONVERT TO USEABLE CURRENCY WEI
-  const tx = await contract.transfer(recipient, amountInWei).send({
-    from: account.address,
-    gasPrice: 10000000000
-  });
+    // method:3
+    const amountInWei = await kit.web3.utils.toWei(amount.toString(), "ether"); //TODO: CONVERT TO USEABLE CURRENCY WEI
+    const tx = await contract.transfer(recipient, amountInWei).send({
+      from: account.address,
+      gasPrice: 10000000000
+    });
 
-  const hash = await tx.getHash();
-  console.log("Hash receipt recieved", hash);
-  const receipt = await tx.waitReceipt();
-  console.log("Tx receipt recieved", receipt);
+    const hash = await tx.getHash();
+    console.log("Hash receipt recieved", hash);
+    const receipt = await tx.waitReceipt();
+    console.log("Tx receipt recieved", receipt);
 
-  const newOrganizationBalance = await contract.balanceOf(account.address);
-  const newBalance = await contract.balanceOf(recipient);
-  console.log(`New Receipt balance is ${newBalance.toString()}`);
-  console.log(
-    `New Oganization balance is ${newOrganizationBalance.toString()}`
-  );
-  // kit.stop();
+    const newOrganizationBalance = await contract.balanceOf(account.address);
+    const newBalance = await contract.balanceOf(recipient);
+    console.log(`New Receipt balance is ${newBalance.toString()}`);
+    console.log(
+      `New Oganization balance is ${newOrganizationBalance.toString()}`
+    );
+    // kit.stop();
 
-  //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
+    //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
 
-  return {
-    hash: hash,
-    receipt: receipt,
-    organizationBalance: newOrganizationBalance,
-    wallet: recipient,
-    walletBalance: newBalance
-  };
+    return {
+      hash: hash,
+      receipt: receipt,
+      organizationBalance: newOrganizationBalance,
+      wallet: recipient,
+      walletBalance: newBalance
+    };
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 module.exports = {

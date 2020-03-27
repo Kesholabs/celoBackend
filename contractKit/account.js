@@ -6,18 +6,26 @@ const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE TH
 const kit = contractkit.newKit(NODE_URL);
 
 const ratesJson = require(__dirname + "./../exchangeRates.json");
+// const publicPath = require(__dirname + "./../public/");
 
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
  */
 function createAccount(identity) {
   console.log("Creating a new account");
-  const account = web3Instance.eth.accounts.create();
-  console.log(`Made new account ${account.address}`);
-  fs.writeFileSync(identity, account.privateKey);
-  console.log(`Account private key saved to ${identity}`);
-  console.log(`Wallet Address ${account.address}`);
-  return account;
+  try {
+    const account = web3Instance.eth.accounts.create();
+    console.log(`Made new account ${account.address}`);
+    fs.writeFileSync("./public/" + identity, account.privateKey, error => {
+      if (error) return console.error(error);
+      console.log(`Account private key saved to ${identity}`);
+      console.log(`Wallet Address ${account.address}`);
+    });
+
+    return account;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 /**
@@ -25,15 +33,19 @@ function createAccount(identity) {
  */
 function getAccount(identity) {
   console.log("Getting your account");
-  if (!fs.existsSync(identity)) {
-    console.log("No account found, create one first");
-    return false;
-  }
+  try {
+    if (!fs.existsSync(identity)) {
+      console.log("No account found, create one first");
+      return false;
+    }
 
-  const privateKey = fs.readFileSync(identity, "utf8");
-  const account = web3Instance.eth.accounts.privateKeyToAccount(privateKey);
-  console.log(`Found account ${account.address}`);
-  return account;
+    const privateKey = fs.readFileSync("./public/" + identity, "utf8");
+    const account = web3Instance.eth.accounts.privateKeyToAccount(privateKey);
+    console.log(`Found account ${account.address}`);
+    return account;
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 /**
@@ -41,24 +53,28 @@ function getAccount(identity) {
  */
 async function getBalances(identity, localCurrency) {
   console.log("Getting your balances");
-  const address = getAccount(identity).address;
-  if (!address) return "Invalid identity or no account exists";
+  try {
+    const address = getAccount(identity).address;
+    if (!address) return "Invalid identity or no account exists";
 
-  const web33 = kit.web3;
-  // const balances = await web3.eth.getBalance(address)
-
-  const balances = await kit.getTotalBalance(address);
-  const balanceUSD = await kit.web3.utils.fromWei(balances.usd.toString(), "ether") ;
-  console.log("balance ", balanceUSD);
-  const local = await currencyConvertion(localCurrency, balanceUSD); //TODO: CURRENCY IN DOLLARS, CONVERT TO ANY OTHER CURRENCY
-  console.log(`${localCurrency} balance: ${local.local_Currency}`);
-  console.log(`Dollar balance: ${balanceUSD}`);
-  // console.log(`Gold balance: ${balances.gold}`);
-  // kit.stop();
-  return {
-    usd: balanceUSD,
-    local: local.local_Currency
-  };
+    const balances = await kit.getTotalBalance(address);
+    const balanceUSD = await kit.web3.utils.fromWei(
+      balances.usd.toString(),
+      "ether"
+    );
+    console.log("balance ", balanceUSD);
+    const local = await currencyConvertion(localCurrency, balanceUSD); //TODO: CURRENCY IN DOLLARS, CONVERT TO ANY OTHER CURRENCY
+    console.log(`${localCurrency} balance: ${local.local_Currency}`);
+    console.log(`Dollar balance: ${balanceUSD}`);
+    // console.log(`Gold balance: ${balances.gold}`);
+    // kit.stop();
+    return {
+      usd: balanceUSD,
+      local: local.local_Currency
+    };
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 function currencyConvertion(localCurrency, balances) {
@@ -69,7 +85,8 @@ function currencyConvertion(localCurrency, balances) {
         local_Currency: `No Currency with the following Symbol ${localCurrency}`
       };
 
-    if (localCurrency === "USD") return { local_Currency: `${balances}` };
+    if (localCurrency === "USD")
+      return { cUsd: `${balances}`, local_Currency: `${balances}` };
 
     console.log(`Currency rate, ${ratesJson["rates"][localCurrency]}`);
     console.log(`Currency convertion from USD to ${localCurrency}`);
@@ -77,6 +94,7 @@ function currencyConvertion(localCurrency, balances) {
       `Currency Converted ${balances * ratesJson["rates"][localCurrency]}`
     );
     return {
+      cUsd: `${balances / ratesJson["rates"][localCurrency]}`,
       local_Currency: `${balances * ratesJson["rates"][localCurrency]}`
     };
   } catch (err) {

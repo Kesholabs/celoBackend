@@ -9,12 +9,12 @@ const logger = helper.getLogger("SERVICE_DELIVERY");
 // var reader = fs.createReadStream("data.json");
 // var writer = fs.createWriteStream("out.csv");
 
-const schedule = cron.schedule("* * * * *", async () => {
+const schedule = cron.schedule("* * * *", async () => {
   logger.info(
-    "\n\n=============== RUNNING A TASK EVERY MINUTE ================\n\n"
+    "\n\n=============== RUNNING A TASK EVERY HOUR ================\n\n"
   );
 
-  const url = "https://api.exchangeratesapi.io/latest";
+  const url = "https://openexchangerates.org/api/latest.json?app_id=2b0e9491c3d44b9999b4142103f606a4";
 
   axios
     .get(url)
@@ -29,24 +29,6 @@ const schedule = cron.schedule("* * * * *", async () => {
         logger.debug("EXCHANGE RATE DATA CREATED");
       });
 
-      // jsonToCSV(rates, fileName)
-      //   .then(() => {
-      //     // success
-      //     logger.debug("EXCHANGE RATE DATA CREATED");
-      //   })
-      //   .catch(error => {
-      //     // handle error
-      //     logger.debug("EXCHANGE RATE DATA FAILED");
-      //   });
-
-      // let writer = fs.createWriteStream("exchangeRates.json");
-      // rates.pipe(jsonexport()).pipe(writer);
-
-      // jsonexport(rates, (err, csv) => {
-      //   if (err) return logger.error(err);
-      //   logger.info("create rates csv ", csv);
-      //   fs.createWriteStream("exchangeRates.csv");
-      // });
     })
     .catch(error => {
       logger.error(error);
