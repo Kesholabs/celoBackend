@@ -23,16 +23,7 @@ pipeline {
 			}
 		}
 
-		stage('RESTARTING PM2') {
-			steps {
-				sh '''
-				sudo su - celo
-				cd /home/celo/celoBackend
-				sudo pm2 restart app
-                                echo "done"
-				'''
-			}
-		}
+	
     
  
 		}
