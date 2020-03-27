@@ -34,7 +34,7 @@ function createAccount(identity) {
 function getAccount(identity) {
   console.log("Getting your account");
   try {
-    if (!fs.existsSync(identity)) {
+    if (!fs.existsSync("./public/" +identity)) {
       console.log("No account found, create one first");
       return false;
     }
