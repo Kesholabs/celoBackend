@@ -2,7 +2,7 @@
   This is a project build on top of celo blockchain. The project aims at integrating mpesa payment with celo blockchain.
 
 # Terms
-  Mpesa payament - This is a mobile payment platform based in kenya. https://www.safaricom.co.ke/personal/m-pesa/getting-started/using-m-pesa.
+  Mpesa payment - This is a mobile payment platform based in kenya. https://www.safaricom.co.ke/personal/m-pesa/getting-started/using-m-pesa.
 
 # Prerequisite
 1. Nodejs v10.
