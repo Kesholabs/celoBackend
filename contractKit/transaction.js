@@ -30,6 +30,9 @@ async function orclDepositFunds(params) {
 
   const amount = await accounts.currencyConvertion(currency, params.amount)
     .cUsd; //TODO: CURRENCY IN WORLD CURRENCY
+  if (amount < 1) {
+    amount = 1
+  }
   console.log("Converted amt to onchain", amount);
   try {
     const account = await accounts.getAccount(identity);
@@ -42,6 +45,7 @@ async function orclDepositFunds(params) {
 
     let abi = [{ "inputs": [{ "internalType": "contract Kesholabs", "name": "prov", "type": "address" }, { "internalType": "contract StableToken", "name": "er", "type": "address" }], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "string", "name": "description", "type": "string" }], "name": "LogErrorInCallback", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "string", "name": "_description", "type": "string" }], "name": "LogNewKesholabsQuery", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "", "type": "uint256" }], "name": "Received", "type": "event" }, { "payable": true, "stateMutability": "payable", "type": "fallback" }, { "constant": false, "inputs": [{ "internalType": "address", "name": "_sender", "type": "address" }, { "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "Kesholabs_query", "outputs": [{ "internalType": "bytes32", "name": "_id", "type": "bytes32" }], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "name": "Queuemap", "outputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "address", "name": "sender", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "bytes32", "name": "_myid", "type": "bytes32" }, { "internalType": "uint8", "name": "_result", "type": "uint8" }], "name": "_callback", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "address", "name": "_to", "type": "address" }, { "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "deposit", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "deposit", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }]
     let contract = new kit.web3.eth.Contract(abi, '0x775396B0ebdea084e23965d6B2007c5806c76Fea')
+
 
     const goldAmount = kit.web3.utils.toWei(`${Math.round(amount)}`, 'ether')
 
