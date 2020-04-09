@@ -41,9 +41,6 @@ const Controller = require("../controller/transactionController");
  *       currency:
  *          type: string
  *          example: <Optional> USD, GB, KES
- *       recipient:
- *          type: string
- *          example: <Optional!> username or phonenumber 
  *   ApiModel:
  *     type: object
  *     required:
