@@ -20,7 +20,7 @@ function generateTransID() {
   let length = 6;
   let timestamp = +new Date();
 
-  let _getRandomInt = function(min, max) {
+  let _getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
@@ -41,6 +41,14 @@ const getErrorMessage = async field => {
     code: 400,
     success: false,
     message: field + " field is missing or Invalid in the request"
+  };
+};
+// Generic successful handler used by all endpoints.
+const getOtherErrorMessage = async field => {
+  return {
+    code: 400,
+    success: false,
+    message: field
   };
 };
 
@@ -64,7 +72,7 @@ module.exports = {
   setTranstype,
   generateTransID,
   getErrorMessage,
-  getErrorMessage,
+  getOtherErrorMessage,
   getSuccessMessage,
   getLogger
 };
