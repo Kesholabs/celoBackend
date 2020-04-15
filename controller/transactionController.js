@@ -17,7 +17,7 @@ module.exports = {
     try {
       if (address.startsWith("Error")) {
         const msg = await Helper.getOtherErrorMessage(address);
-        return res.send(msg);
+        return res.status(400).send(msg);
       }
     } catch (e) {
       const msg = await Helper.getSuccessMessage(address);

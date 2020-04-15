@@ -46,7 +46,6 @@ const getErrorMessage = async field => {
 // Generic successful handler used by all endpoints.
 const getOtherErrorMessage = async field => {
   return {
-    code: 400,
     success: false,
     message: field
   };
