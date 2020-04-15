@@ -5,6 +5,8 @@ const Helper = require("../helper/helper");
 const logger = Helper.getLogger("CELO_TRANSACTION_METHODS");
 const accounts = require("./account");
 
+const axios = require('axios')
+
 async function depositFunds(params) {
   console.log("\n================ DEPOSIT FUNDS =================\n");
   const identity = params.account;
@@ -27,8 +29,18 @@ async function orclDepositFunds(params) {
   const identity = params.account;
   //const amount = params.amount;
   const currency = params.currency;
-
-  let amount = await accounts.currencyConvertion(currency, params.amount).cUsd; //TODO: CURRENCY IN WORLD CURRENCY
+  let kesforex = 102;
+  try {
+    kesforex = await axios.get(
+      `http://backend.bithela.com/api/trade/forex/usd/rate/KES`
+    );
+    kesforex = kesforex.data.rate;
+  } catch (e) {
+    console.log("!!!!!!!| Forex err |!!!!!!", e);
+  }
+  console.log('Forex Rate:', kesforex);
+  //let amount = await accounts.currencyConvertion(currency, params.amount).cUsd; //TODO: CURRENCY IN WORLD CURRENCY
+  let amount = params.amount / kesforex;
   console.log("Converted amt", amount);
   try {
     const account = await accounts.getAccount(identity);
@@ -43,7 +55,7 @@ async function orclDepositFunds(params) {
     let contract = new kit.web3.eth.Contract(abi, '0xf0e7d0f01960a1f93394c73F3179CB494AfD32Aa')
 
 
-    const goldAmount = kit.web3.utils.toWei(amount, 'ether')
+    const goldAmount = kit.web3.utils.toWei(`${amount}`, 'ether')
     console.log(">>>>>>>>>>Ethers", goldAmount);
     if (walletBalance.toNumber() < 0) {
       console.log("I have some gas");
