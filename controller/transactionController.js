@@ -11,6 +11,19 @@ module.exports = {
     const msg = await Helper.getSuccessMessage(address);
     return res.send(msg);
   },
+  orclDeposit: async (req, res, next) => {
+    const params = req.body;
+    const address = await contractKit.orclDepositFunds(params);
+    try {
+      if (address.startsWith("Error")) {
+        const msg = await Helper.getOtherErrorMessage(address);
+        return res.status(400).send(msg);
+      }
+    } catch (e) {
+      const msg = await Helper.getSuccessMessage(address);
+      return res.send(msg);
+    }
+  },
 
   withdraw: async (req, res, next) => {
     logger.info("\n=================== WITHDRAW CONTROLLER ====================\n");

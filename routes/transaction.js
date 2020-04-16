@@ -23,8 +23,25 @@ const Controller = require("../controller/transactionController");
  *          example: <Optional> USD, GB, KES
  *       recipient:
  *          type: string
- *          example: <Optional!> username or phonenumber 
- *
+ *          example: <Optional!> username or phonenumber
+ *   OrclModel:
+ *     type: object
+ *     required:
+ *       - phoneNumber
+ *       - account
+ *     properties:
+ *       phoneNumber:
+ *         type: string
+ *         example: 2547
+ *       account:
+ *         type: string
+ *         example: username or phonenumber 
+ *       amount:
+ *          type: string
+ *          example: 100
+ *       currency:
+ *          type: string
+ *          example: <Optional> USD, GB, KES
  *   ApiModel:
  *     type: object
  *     required:
@@ -72,6 +89,32 @@ const Controller = require("../controller/transactionController");
 /* POST DEPOSIT /api/v1/transaction/deposit */
 router.post("/deposit",Jwt.verify, Controller.deposit);
 
+
+/**
+ * @swagger
+ *
+ * /transaction/oracle/deposit:
+ *   post:
+ *     tags: ['Transaction']
+ *     summary: Deposit cUSD on your wallet ACCOUNT
+ *     description: 
+ *     produces:
+ *       - application/json
+ *     parameters:
+ *       - name: body
+ *         in:  body
+ *         description: A function for depositing 
+ *         required: true
+ *         type: string
+ *         schema:
+ *           $ref: '#/definitions/OrclModel'
+ *     responses:
+ *       200:
+ *         description: users
+ *         schema:
+ *           $ref: '#/definitions/ApiModel'
+ */
+router.post("/oracle/deposit", Controller.orclDeposit);
 /**
  * @swagger
  *

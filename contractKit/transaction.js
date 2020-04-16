@@ -1,12 +1,14 @@
-const contractkit = require("@celo/contractkit");
+const contractkit = require('@celo/contractkit');
 const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE THIS TO OUR NODE ADDRESS
 const kit = contractkit.newKit(NODE_URL);
 const Helper = require("../helper/helper");
 const logger = Helper.getLogger("CELO_TRANSACTION_METHODS");
 const accounts = require("./account");
 
+const axios = require('axios')
+
 async function depositFunds(params) {
-  console.log("\n================ DEPOSIT FUNDS=================\n");
+  console.log("\n================ DEPOSIT FUNDS =================\n");
   const identity = params.account;
   const amount = params.amount;
   const currency = params.currency;
@@ -20,6 +22,72 @@ async function depositFunds(params) {
     type: "Deposit"
   };
   return transferFunds(data);
+}
+async function orclDepositFunds(params) {
+  console.log("\n================ ORACLE DEPOSIT FUNDS =================\n");
+  const phoneNumber = params.phoneNumber;
+  const identity = params.account;
+  //const amount = params.amount;
+  const currency = params.currency;
+  let kesforex = 102;
+  try {
+    kesforex = await axios.get(
+      `http://backend.bithela.com/api/trade/forex/usd/rate/KES`
+    );
+    kesforex = kesforex.data.rate;
+  } catch (e) {
+    console.log("!!!!!!!| Forex err |!!!!!!", e);
+  }
+  console.log('Forex Rate:', kesforex);
+  //let amount = await accounts.currencyConvertion(currency, params.amount).cUsd; //TODO: CURRENCY IN WORLD CURRENCY
+  let amount = params.amount / kesforex;
+  console.log("Converted amt", amount);
+  try {
+    const account = await accounts.getAccount(identity);
+    kit.addAccount(account.privateKey);
+    await kit.setFeeCurrency(contractkit.CeloContract.StableToken);
+    console.log("Kit contract is set up, creating transaction");
+    let kitContract = await kit.contracts.getStableToken(); //set stable token as cUSD
+    const walletBalance = await kitContract.balanceOf(account.address);
+    logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
+
+    let abi = [{ "inputs": [{ "internalType": "contract Kesholabs", "name": "prov", "type": "address" }, { "internalType": "contract StableToken", "name": "er", "type": "address" }], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "string", "name": "description", "type": "string" }], "name": "LogErrorInCallback", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "string", "name": "_description", "type": "string" }], "name": "LogNewKesholabsQuery", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "", "type": "uint256" }], "name": "Received", "type": "event" }, { "payable": true, "stateMutability": "payable", "type": "fallback" }, { "constant": false, "inputs": [{ "internalType": "address", "name": "_sender", "type": "address" }, { "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "Kesholabs_query", "outputs": [{ "internalType": "bytes32", "name": "_id", "type": "bytes32" }], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "name": "Queuemap", "outputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "address", "name": "sender", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "bytes32", "name": "_myid", "type": "bytes32" }, { "internalType": "uint8", "name": "_result", "type": "uint8" }], "name": "_callback", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "address", "name": "_to", "type": "address" }, { "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "deposit", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "deposit", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }]
+    let contract = new kit.web3.eth.Contract(abi, '0xf0e7d0f01960a1f93394c73F3179CB494AfD32Aa')
+
+
+    const goldAmount = kit.web3.utils.toWei(`${amount}`, 'ether')
+    console.log(">>>>>>>>>>Ethers", goldAmount);
+    if (walletBalance.toNumber() < 0) {
+      console.log("I have some gas");
+      const tx = await contract.methods.deposit(phoneNumber, goldAmount).send({
+        from: account.address,
+        gasPrice: 10000000000
+      });
+      console.log(tx)
+      if (!tx) {
+        return "Error Processing Request"
+      } else {
+        return tx
+      }
+    } else {
+      console.log("I need some gas");
+      const mainAccount = await accounts.getAccount("MAIN_ACCOUNT");
+      kit.addAccount(mainAccount.privateKey);
+      const tx = await contract.methods.deposit(account.address, phoneNumber, goldAmount).send({
+        from: mainAccount.address,
+        gasPrice: 10000000000
+      });
+      console.log(tx)
+      if (!tx) {
+        return "Error Processing Request"
+      } else {
+        return tx
+      }
+    }
+  } catch (e) {
+    console.log(e);
+    return "Error Processing Request"
+  }
 }
 
 async function withdrawFunds(params) {
@@ -91,6 +159,7 @@ async function send(recipient, amount, identity) {
   const { address } = await accounts.getAccount(recipient);
   return process(address, amount, identity);
 }
+
 async function process(recipient, amount, identity) {
   logger.info("PROCESSING TRANSACTION");
   console.log(
@@ -168,7 +237,8 @@ async function process(recipient, amount, identity) {
 module.exports = {
   transferFunds,
   withdrawFunds,
-  depositFunds
+  depositFunds,
+  orclDepositFunds
 };
 
 /*

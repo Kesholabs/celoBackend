@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "yarn start",
-    "start": "NODE_ENV=development node app.js",
+    "start": "NODE_ENV=development nodemon app.js",
     "prod": "NODE_ENV=production node app.js",
     "test": "NODE_ENV=test jest"
   },
