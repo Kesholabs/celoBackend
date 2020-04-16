@@ -2,29 +2,34 @@ const swaggerJsdoc = require("swagger-jsdoc");
 
 const definition = {
   info: {
-    title: "PesabaseContractKit Application",
-    description: "This is an application build on celo blockchain",
     openapi: "3.0.0",
-    termsOfService: "http://swagger.io/terms/",
+    title: "CELOBACKEND APPLICATION",
+    description: "This is an application build on celo blockchain",
     contact: { name: "API Support", email: "cjnjenga@gmail.com" },
-    license: {
-      name: "Apache 2.0",
-      url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-    },
     version: "1.0.0"
   },
   host: `${process.env.HOST}:${process.env.PORT}`,
+  schemes: ["http", "https"],
   basePath: "/api/v1",
   tags: [
     {
       name: "Account",
-      description: "This should allow users to create `WALLET ADDRESS AND THEIR PRIVATE KEY`."
+      description:
+        "This should allow users to create `WALLET ADDRESS AND THEIR PRIVATE KEY`."
     },
     {
       name: "Transaction",
-      description: "This sholud allow users to transact `DEPOSIT WITHDRAW TRANSFER`"
+      description:
+        "This sholud allow users to transact `DEPOSIT WITHDRAW TRANSFER`"
     }
-  ]
+  ],
+  securityDefinitions: {
+    Bearer: {
+      type: "apiKey",
+      in: "header",
+      name: "Authorization"
+    }
+  }
 };
 
 const options = {

@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+const Jwt = require('../middleware/jwt');
 const Controller = require("../controller/transactionController");
 
 /**
@@ -59,13 +60,17 @@ const Controller = require("../controller/transactionController");
  *           $ref: '#/definitions/TransactionModel'
  *     responses:
  *       200:
- *         description: users
+ *         description: successful operation
  *         schema:
  *           $ref: '#/definitions/ApiModel'
+ *       401:
+ *         description: Error Occurred - Invalid Access Token
+ *     security:
+ *      - Bearer: []
  */
 
 /* POST DEPOSIT /api/v1/transaction/deposit */
-router.post("/deposit", Controller.deposit);
+router.post("/deposit",Jwt.verify, Controller.deposit);
 
 /**
  * @swagger
@@ -87,13 +92,17 @@ router.post("/deposit", Controller.deposit);
  *           $ref: '#/definitions/TransactionModel'
  *     responses:
  *       200:
- *         description: users
+ *         description: successful operation
  *         schema:
  *           $ref: '#/definitions/ApiModel'
+ *       401:
+ *         description: Error Occurred - Invalid Access Token
+ *     security:
+ *      - Bearer: []
  */
 
 /* POST WITHDRAW - /api/v1/transaction/withdraw */
-router.post("/withdraw", Controller.withdraw);
+router.post("/withdraw",Jwt.verify, Controller.withdraw);
 
 /**
  * @swagger
@@ -115,12 +124,16 @@ router.post("/withdraw", Controller.withdraw);
  *           $ref: '#/definitions/TransactionModel'
  *     responses:
  *       200:
- *         description: users
+ *         description: successful operation
  *         schema:
  *           $ref: '#/definitions/ApiModel'
+ *       401:
+ *         description: Error Occurred - Invalid Access Token
+ *     security:
+ *      - Bearer: []
  */
 
 /* POST TRANSFER- /api/v1/transaction/transfer */
-router.post("/transfer", Controller.transfer);
+router.post("/transfer",Jwt.verify, Controller.transfer);
 
 module.exports = router;

@@ -11,10 +11,10 @@ async function depositFunds(params) {
   const amount = params.amount;
   const currency = params.currency;
 
-  const walletAddress = await accounts.getAccount(identity).address;
+  const { address } = await accounts.getAccount(identity);
   const data = {
     account: "MAIN_ACCOUNT",
-    recipient: walletAddress,
+    recipient: address,
     amount: amount,
     currency: currency,
     type: "Deposit"
@@ -28,12 +28,12 @@ async function withdrawFunds(params) {
   const amount = params.amount;
   const currency = params.currency;
 
-  const ownWallet = await accounts.getAccount(identity).address;
-  const walletAddress = await accounts.getAccount("MAIN_ACCOUNT").address;
+  const ownWallet = await accounts.getAccount(identity);
+  const walletAddress = await accounts.getAccount("MAIN_ACCOUNT");
   const data = {
     account: identity,
-    ownAdress: ownWallet,
-    recipient: walletAddress,
+    ownAdress: ownWallet.address,
+    recipient: walletAddress.address,
     amount: amount,
     currency: currency,
     type: "Withdraw"
@@ -43,6 +43,7 @@ async function withdrawFunds(params) {
 
 async function transferFunds(params) {
   console.log("\n================ TRANSFER FUNDS=================\n");
+  console.log("Body \n ", params);
   const identity = params.account;
   const ownAdress = params.ownAdress;
   const currency = params.currency;
@@ -53,7 +54,9 @@ async function transferFunds(params) {
 
   switch (type) {
     case "Deposit":
-      console.log(`${type} payment of ${amount} to ${identity} : ${recipient}`);
+      console.log(
+        `${type} payment of ${amount} from ${identity} : ${recipient}`
+      );
       return buyIn(recipient, amount, identity);
     case "Withdraw":
       console.log(
@@ -66,7 +69,9 @@ async function transferFunds(params) {
       );
       return send(recipient, amount, identity);
     default:
-      console.log(`${type} payment of ${amount} to ${identity} : ${recipient}`);
+      console.log(
+        `${type} payment of ${amount} from ${identity} : ${recipient}`
+      );
       return "Invalid transaction type";
   }
 }
@@ -83,10 +88,9 @@ async function buyOut(recipient, amount, identity) {
 
 async function send(recipient, amount, identity) {
   logger.info("Send Method");
-  const recipientWallet = await accounts.getAccount(recipient).address;
-  return process(recipientWallet, amount, identity);
+  const { address } = await accounts.getAccount(recipient);
+  return process(address, amount, identity);
 }
-
 async function process(recipient, amount, identity) {
   logger.info("PROCESSING TRANSACTION");
   console.log(
@@ -156,6 +160,8 @@ async function process(recipient, amount, identity) {
     };
   } catch (error) {
     console.error(error);
+    const msg = await Helper.getErrorMessage(error);
+    return msg;
   }
 }
 

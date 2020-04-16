@@ -1,4 +1,5 @@
 const log4js = require("log4js");
+const bcrypt = require("bcrypt");
 const logger = log4js.getLogger("HELPER_METHOD");
 logger.level = "debug";
 
@@ -20,7 +21,7 @@ function generateTransID() {
   let length = 6;
   let timestamp = +new Date();
 
-  let _getRandomInt = function(min, max) {
+  let _getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 
@@ -44,6 +45,15 @@ const getErrorMessage = async field => {
   };
 };
 
+// Generic error handler used by all endpoints.
+const getErrorUnathorized = async field => {
+  return {
+    code: 401,
+    success: false,
+    message: field + " request"
+  };
+};
+
 // Generic successful handler used by all endpoints.
 const getSuccessMessage = async field => {
   return {
@@ -60,11 +70,20 @@ const getLogger = moduleName => {
   return logger;
 };
 
+const generateHash = function (password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(12));
+};
+
+const validPassword = function (issuedPassword, password) {
+  return bcrypt.compareSync(issuedPassword, password);
+};
 module.exports = {
   setTranstype,
   generateTransID,
   getErrorMessage,
-  getErrorMessage,
+  getErrorUnathorized,
   getSuccessMessage,
-  getLogger
+  getLogger,
+  generateHash,
+  validPassword
 };
