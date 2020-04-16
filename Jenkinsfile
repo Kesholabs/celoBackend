@@ -19,6 +19,7 @@ pipeline {
 				sudo su - celo-dev
 				cd /home/celo-dev/celoBackend
 				sudo yarn
+                                echo "done"
 				'''
 			}
 		}
