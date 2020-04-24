@@ -23,6 +23,7 @@ async function depositFunds(params) {
   };
   return transferFunds(data);
 }
+
 async function orclDepositFunds(params) {
   console.log("\n================ ORACLE DEPOSIT FUNDS =================\n");
   const phoneNumber = params.phoneNumber;

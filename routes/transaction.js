@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-const Jwt = require('../middleware/jwt');
+const Jwt = require("../middleware/jwt");
 const Controller = require("../controller/transactionController");
 
 /**
@@ -14,7 +14,7 @@ const Controller = require("../controller/transactionController");
  *     properties:
  *       account:
  *         type: string
- *         example: username or phonenumber 
+ *         example: username or phonenumber
  *       amount:
  *          type: string
  *          example: 100
@@ -35,7 +35,7 @@ const Controller = require("../controller/transactionController");
  *         example: 2547
  *       account:
  *         type: string
- *         example: username or phonenumber 
+ *         example: username or phonenumber
  *       amount:
  *          type: string
  *          example: 100
@@ -64,13 +64,13 @@ const Controller = require("../controller/transactionController");
  *   post:
  *     tags: ['Transaction']
  *     summary: Deposit cUSD on your wallet ACCOUNT
- *     description: 
+ *     description:
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: body
  *         in:  body
- *         description: A function for depositing 
+ *         description: A function for depositing
  *         required: true
  *         type: string
  *         schema:
@@ -87,8 +87,7 @@ const Controller = require("../controller/transactionController");
  */
 
 /* POST DEPOSIT /api/v1/transaction/deposit */
-router.post("/deposit",Jwt.verify, Controller.deposit);
-
+router.post("/deposit", Jwt.verify, Controller.deposit);
 
 /**
  * @swagger
@@ -97,13 +96,13 @@ router.post("/deposit",Jwt.verify, Controller.deposit);
  *   post:
  *     tags: ['Transaction']
  *     summary: Deposit cUSD on your wallet ACCOUNT
- *     description: 
+ *     description:
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: body
  *         in:  body
- *         description: A function for depositing 
+ *         description: A function for depositing
  *         required: true
  *         type: string
  *         schema:
@@ -114,7 +113,8 @@ router.post("/deposit",Jwt.verify, Controller.deposit);
  *         schema:
  *           $ref: '#/definitions/ApiModel'
  */
-router.post("/oracle/deposit", Controller.orclDeposit);
+router.post("/oracle/deposit", Jwt.verify, Controller.orclDeposit);
+
 /**
  * @swagger
  *
@@ -122,13 +122,13 @@ router.post("/oracle/deposit", Controller.orclDeposit);
  *   post:
  *     tags: ['Transaction']
  *     summary: Withdraw cUSD on your wallet ACCOUNT
- *     description: 
+ *     description:
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: body
  *         in:  body
- *         description: A function for depositing 
+ *         description: A function for depositing
  *         required: true
  *         type: string
  *         schema:
@@ -145,7 +145,7 @@ router.post("/oracle/deposit", Controller.orclDeposit);
  */
 
 /* POST WITHDRAW - /api/v1/transaction/withdraw */
-router.post("/withdraw",Jwt.verify, Controller.withdraw);
+router.post("/withdraw", Jwt.verify, Controller.withdraw);
 
 /**
  * @swagger
@@ -154,13 +154,13 @@ router.post("/withdraw",Jwt.verify, Controller.withdraw);
  *   post:
  *     tags: ['Transaction']
  *     summary: Transfer cUSD from one ACCOUNT to another ACCOUNT
- *     description: 
+ *     description:
  *     produces:
  *       - application/json
  *     parameters:
  *       - name: body
  *         in:  body
- *         description: A function for depositing 
+ *         description: A function for depositing
  *         required: true
  *         type: string
  *         schema:
@@ -177,6 +177,6 @@ router.post("/withdraw",Jwt.verify, Controller.withdraw);
  */
 
 /* POST TRANSFER- /api/v1/transaction/transfer */
-router.post("/transfer",Jwt.verify, Controller.transfer);
+router.post("/transfer", Jwt.verify, Controller.transfer);
 
 module.exports = router;

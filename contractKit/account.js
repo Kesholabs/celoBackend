@@ -35,13 +35,7 @@ async function createAccount(body) {
     console.log(`Account private key saved to ${identity}`);
     console.log(`Wallet Address ${wallet.address}`);
 
-    //ISSUE JWT
-    const token = await Redis.getAccount(identity, password);
-    console.log(token);
-    return {
-      address: wallet.address,
-      token: token
-    };
+    return wallet.address;
   } catch (error) {
     console.error(error);
     return error;

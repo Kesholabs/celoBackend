@@ -2,6 +2,7 @@ const Util = require("util");
 const Helper = require("../helper/helper");
 const logger = Helper.getLogger("ACCOUNT_CONTROLLER");
 const contractKit = require("../contractKit/account");
+const qrCode = require("../middleware/qrcode");
 
 module.exports = {
   createAddressAccount: async (req, res, next) => {
@@ -10,6 +11,7 @@ module.exports = {
     );
     const account = req.body;
     const address = await contractKit.createAccount(account);
+    // const address = await qrCode.typeOfQRCode(account);
     const msg = await Helper.getSuccessMessage(address);
     return res.send(msg);
   },

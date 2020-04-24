@@ -13,10 +13,19 @@ const definition = {
   basePath: "/api/v1",
   tags: [
     {
+      name: "Auth",
+      description: "This should allow users to validate their `ACCOUNT`."
+    },
+    {
       name: "Account",
       description:
         "This should allow users to create `WALLET ADDRESS AND THEIR PRIVATE KEY`."
     },
+    // {
+    //   name: "Merchants",
+    //   description:
+    //     "This should allow users to create `WALLET ADDRESS AND THEIR PRIVATE KEY`."
+    // },
     {
       name: "Transaction",
       description:

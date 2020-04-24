@@ -16,6 +16,9 @@ const Controller = require("../controller/accountController");
  *       account:
  *         type: string
  *         example: username or email or phonenumber
+ *       type:
+ *         type: string
+ *         example: own | merchant
  *       password:
  *          type: string
  *          example: account2019
