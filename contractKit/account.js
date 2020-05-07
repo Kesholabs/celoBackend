@@ -80,8 +80,8 @@ async function getBalances(body, localCurrency) {
 
     const balances = await kit.getTotalBalance(address);
     console.log("BALANCE ", balances.usd);
-    var bntokens = await web3.utils.toBN(balances.usd);
-    const balanceUSD = await kit.web3.utils.fromWei(bntokens, "ether");
+    var bnBalance = await web3.utils.toBN(balances.usd);
+    const balanceUSD = await kit.web3.utils.fromWei(bnBalance, "ether");
     console.log("balance ", balanceUSD);
     const local = await currencyConvertion(localCurrency, balanceUSD); //TODO: CURRENCY IN DOLLARS, CONVERT TO ANY OTHER CURRENCY
     console.log(`${localCurrency} balance: ${local.local_Currency}`);
