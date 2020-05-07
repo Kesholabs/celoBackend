@@ -9,6 +9,7 @@ const Crypto = require("../middleware/crypto");
 const Redis = require("../middleware/redis");
 
 const ratesJson = require(__dirname + "./../exchangeRates.json");
+kit.web3Instance;
 
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
@@ -73,15 +74,14 @@ async function getAccount(identity) {
 async function getBalances(body, localCurrency) {
   console.log("Getting your balances");
   try {
-    const { account, password } = body;
+    const { account } = body;
     const { address } = await getAccount(account);
     if (!address) return "Invalid account or no account exists";
 
     const balances = await kit.getTotalBalance(address);
-    const balanceUSD = await kit.web3.utils.fromWei(
-      balances.usd.toString(),
-      "ether"
-    );
+    console.log("BALANCE ", balances.usd);
+    var bntokens = await web3.utils.toBN(balances.usd);
+    const balanceUSD = await kit.web3.utils.fromWei(bntokens, "ether");
     console.log("balance ", balanceUSD);
     const local = await currencyConvertion(localCurrency, balanceUSD); //TODO: CURRENCY IN DOLLARS, CONVERT TO ANY OTHER CURRENCY
     console.log(`${localCurrency} balance: ${local.local_Currency}`);
