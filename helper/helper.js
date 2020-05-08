@@ -1,39 +1,8 @@
 const log4js = require("log4js");
+const bcrypt = require("bcrypt");
 const logger = log4js.getLogger("HELPER_METHOD");
 logger.level = "debug";
 
-function setTranstype(type) {
-  switch (type) {
-    case "Deposit":
-      return "D" + generateTransID();
-    case "Transfer":
-      return "T" + generateTransID();
-    case "Withdraw":
-      return "W" + generateTransID();
-    default:
-      console.error("Ivalid transaction type %s", type);
-      return "ERROR" + generateTransID();
-  }
-}
-
-function generateTransID() {
-  let length = 6;
-  let timestamp = +new Date();
-
-  let _getRandomInt = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-  let ts = timestamp.toString();
-  let parts = ts.split("").reverse();
-  let id = "";
-
-  for (let i = 0; i < length; ++i) {
-    let index = _getRandomInt(0, parts.length - 1);
-    id += parts[index];
-  }
-  return id;
-}
 
 // Generic error handler used by all endpoints.
 const getErrorMessage = async field => {
@@ -43,11 +12,13 @@ const getErrorMessage = async field => {
     message: field + " field is missing or Invalid in the request"
   };
 };
-// Generic successful handler used by all endpoints.
-const getOtherErrorMessage = async field => {
+
+// Generic error handler used by all endpoints.
+const getErrorUnathorized = async field => {
   return {
+    code: 401,
     success: false,
-    message: field
+    message: field + " request"
   };
 };
 
@@ -67,11 +38,19 @@ const getLogger = moduleName => {
   return logger;
 };
 
+const generateHash = function (password) {
+  return bcrypt.hashSync(password, bcrypt.genSaltSync(12));
+};
+
+const validPassword = function (issuedPassword, password) {
+  return bcrypt.compareSync(issuedPassword, password);
+};
+
 module.exports = {
-  setTranstype,
-  generateTransID,
   getErrorMessage,
-  getOtherErrorMessage,
+  getErrorUnathorized,
   getSuccessMessage,
-  getLogger
+  getLogger,
+  generateHash,
+  validPassword
 };

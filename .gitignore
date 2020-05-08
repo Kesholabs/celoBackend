@@ -6,7 +6,7 @@ yarn-error.log
 config.development.json
 config.production.json
 config.test.json
-public
+public/*
 REST.rest
 .env
 07*

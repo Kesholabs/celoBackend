@@ -1,12 +1,38 @@
 var express = require("express");
 var router = express.Router();
-const Controller = require("../controller/accounts");
+const Jwt = require("../middleware/jwt");
+const Controller = require("../controller/accountController");
 
 /**
  * @swagger
  *
  * definitions:
  *   AccountModel:
+ *     type: object
+ *     required:
+ *       - account
+ *       - password
+ *     properties:
+ *       account:
+ *         type: string
+ *         example: username or email or phonenumber
+ *       type:
+ *         type: string
+ *         example: own | merchant
+ *       password:
+ *          type: string
+ *          example: account2019
+ *
+ *   AddressModel:
+ *     type: object
+ *     required:
+ *       - account
+ *     properties:
+ *       account:
+ *         type: string
+ *         example: username or email or phonenumber
+ *
+ *   BalanceModel:
  *     type: object
  *     required:
  *       - account
@@ -52,9 +78,11 @@ const Controller = require("../controller/accounts");
  *           $ref: '#/definitions/AccountModel'
  *     responses:
  *       200:
- *         description: users
+ *         description: successful operation
  *         schema:
  *           $ref: '#/definitions/ApiModel'
+ *       401:
+ *         description: Error Occurred - Invalid Access Token
  */
 
 /* POST Create Account- /api/v1/account/create */
@@ -76,16 +104,20 @@ router.post("/create", Controller.createAddressAccount);
  *         required: true
  *         type: string
  *         schema:
- *           $ref: '#/definitions/AccountModel'
+ *           $ref: '#/definitions/AddressModel'
  *     responses:
  *       200:
- *         description: users
+ *         description: successful operation
  *         schema:
  *           $ref: '#/definitions/ApiModel'
+ *       401:
+ *         description: Error Occurred - Invalid Access Token
+ *     security:
+ *      - Bearer: []
  */
 
 /* POST Get Wallet Account - /api/v1/account/getaccount */
-router.post("/getaccount", Controller.getWalletAddress);
+router.post("/getaccount", Jwt.verify, Controller.getWalletAddress);
 
 /**
  * @swagger
@@ -103,14 +135,18 @@ router.post("/getaccount", Controller.getWalletAddress);
  *         required: true
  *         type: string
  *         schema:
- *           $ref: '#/definitions/AccountModel'
+ *           $ref: '#/definitions/BalanceModel'
  *     responses:
  *       200:
- *         description: users
+ *         description: successful operation
  *         schema:
  *           $ref: '#/definitions/ApiModel'
+ *       401:
+ *         description: Error Occurred - Invalid Access Token
+ *     security:
+ *      - Bearer: []
  */
 /* GET Get Balance - /api/v1/account/getaccount */
-router.post("/getbalance", Controller.getAddressBalance);
+router.post("/getbalance", Jwt.verify, Controller.getAddressBalance);
 
 module.exports = router;

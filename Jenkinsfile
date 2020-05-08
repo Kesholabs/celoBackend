@@ -1,24 +1,25 @@
 pipeline {
 	agent {
-		label 'pb-webapp-slave'
+		label 'deficon-slave'
 	}
 		
 	stages {
 		stage('PULLING THE CHANGES') {
 			steps {
 				sh '''
-				sudo su - celo
-				cd /home/celo/celoBackend
-				sudo git pull https://github.com/Kesholabs/celoBackend.git
+				sudo su - celo-dev
+				cd /home/celo-dev/celoBackend
+				sudo git pull origin dev
 				'''
 			}
 		}
 		stage('INSTALLING DEPENDENCIES') {
 			steps {
 				sh '''
-				sudo su - celo
-				cd /home/celo/celoBackend
+				sudo su - celo-dev
+				cd /home/celo-dev/celoBackend
 				sudo yarn
+                                echo "done"
 				'''
 			}
 		}

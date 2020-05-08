@@ -1,15 +1,11 @@
 const axios = require("axios");
 const cron = require("node-cron");
-const jsonexport = require("jsonexport");
-var jsonToCSV = require("json-to-csv");
 var fs = require("fs");
 const helper = require("../helper/helper");
 const logger = helper.getLogger("SERVICE_DELIVERY");
 
-// var reader = fs.createReadStream("data.json");
-// var writer = fs.createWriteStream("out.csv");
 
-const schedule = cron.schedule("* * * *", async () => {
+const schedule = cron.schedule("0 */1 * * *", async () => {
   logger.info(
     "\n\n=============== RUNNING A TASK EVERY HOUR ================\n\n"
   );
@@ -25,7 +21,7 @@ const schedule = cron.schedule("* * * *", async () => {
       const fileName = "exchangeRates.json";
 
       fs.writeFile(fileName, JSON.stringify(rates), function(err) {
-        if (err) throw new Error();
+        if (err) throw new Error(err);
         logger.debug("EXCHANGE RATE DATA CREATED");
       });
 

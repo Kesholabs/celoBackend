@@ -8,8 +8,11 @@ var logger = require("morgan");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./Docs/swaggerConfig");
 
-// const service = require("./service/exchangeRate");
+// const redis = require("./middleware/redis");
 
+const service = require("./service/exchangeRate");
+
+var authRouter = require("./routes/auth");
 var account = require("./routes/accounts");
 var transaction = require("./routes/transaction");
 
@@ -26,6 +29,11 @@ const startApp = async () => {
   app.use(cookieParser());
   app.use(cors());
 
+  //redis
+  // await redis.client();
+
+  //routes
+  app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/account", account);
   app.use("/api/v1/transaction", transaction);
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
