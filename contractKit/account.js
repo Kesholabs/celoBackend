@@ -9,7 +9,6 @@ const Crypto = require("../middleware/crypto");
 const Redis = require("../middleware/redis");
 
 const ratesJson = require(__dirname + "./../exchangeRates.json");
-kit.web3Instance;
 
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
@@ -24,9 +23,6 @@ async function createAccount(body) {
 
     //ENCRYPT PRIVATE KEY
     const encryptedData = await Crypto.encrypt(wallet.privateKey);
-
-    //SAVE USER PASSWORD
-    await Redis.setAccounts(identity, password);
 
     //WRITE PRIVATE KEY TO FILE
     fs.writeFileSync(

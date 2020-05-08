@@ -8,6 +8,8 @@ module.exports = {
       "\n=================== VALIDATE ACCOUNT AND ISSUE JWT ====================\n"
     );
     const { account, password } = req.body;
+    //SAVE USER PASSWORD
+    // const token = await Redis.setAccounts(account, password);
     //ISSUE JWT
     const token = await Redis.getAccount(account, password);
     console.log(token);

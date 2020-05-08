@@ -6,7 +6,6 @@ const Helper = require("../helper/helper");
 const logger = Helper.getLogger("REDIS_MIDDLEWARE");
 const JWT = require("./jwt");
 
-
 const client = redis.createClient(REDIS_PORT);
 
 client.on("connect", function () {
@@ -19,17 +18,23 @@ client.on("error", function (err) {
 
 //methods
 const setAccounts = async (key, value) => {
-  //   console.log(key + ":" + value);
+  console.log(key + ":" + value);
   const hashPrivatekey = await Helper.generateHash(value);
-  client.set(key, hashPrivatekey, redis.print);
+  return client.set(key, hashPrivatekey, redis.print);
 };
 
 const getAccount = async (key, value) => {
   let msg = "Unauthorized";
 
+  let isUserAvailable = await client.getAsync(key);
+  console.log("Available User ", isUserAvailable);
+  if (!isUserAvailable) {
+    await setAccounts(key, value);
+  }
+
   var results = client.getAsync(key).then(async result => {
     if (!result) {
-      logger.error(msg);
+      logger.error(`${msg} User doesn't exits...Create new user`);
       return msg;
     }
 
@@ -40,7 +45,7 @@ const getAccount = async (key, value) => {
       return msg;
     }
 
-    token = await JWT.jsonwtSign({ account: key });
+    let token = await JWT.jsonwtSign({ account: key });
     logger.debug("Issue JWT ", token);
     return token;
   });
