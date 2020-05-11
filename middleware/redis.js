@@ -24,6 +24,7 @@ const setAccounts = async (key, value) => {
 };
 
 const getAccount = async (key, value) => {
+  logger.debug("auth details ", key, value);
   let msg = "Unauthorized";
 
   let isUserAvailable = await client.getAsync(key);
@@ -45,7 +46,9 @@ const getAccount = async (key, value) => {
       return msg;
     }
 
-    let token = await JWT.jsonwtSign({ account: key });
+    logger.debug("Generating JWT token ", key);
+
+    let token = await JWT.jsonwtSign({ key });
     logger.debug("Issue JWT ", token);
     return token;
   });
