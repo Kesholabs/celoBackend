@@ -28,7 +28,6 @@ const getAccount = async (key, value) => {
   let msg = "Unauthorized";
 
   let isUserAvailable = await client.getAsync(key);
-  console.log("Available User ", isUserAvailable);
   if (!isUserAvailable) {
     logger.info("User does not exist in the system");
     logger.info("Create user ", key);
@@ -44,7 +43,7 @@ const getAccount = async (key, value) => {
       return msg;
     }
 
-    logger.debug("Found user with password");
+    logger.info("Found user with password");
 
     if (!(await Helper.validPassword(value, result))) {
       logger.error(msg);
@@ -54,7 +53,7 @@ const getAccount = async (key, value) => {
     // logger.debug("Generating JWT token ", key);
 
     let token = await JWT.jsonwtSign({ key });
-    logger.debug("Issue JWT ", token);
+    logger.info("Issue JWT ", token);
     return token;
   });
 
