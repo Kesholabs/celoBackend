@@ -31,7 +31,6 @@ async function createAccount(body) {
     );
     console.log(`Account private key saved to ${identity}`);
     console.log(`Wallet Address ${wallet.address}`);
-
     return wallet.address;
   } catch (error) {
     console.error(error);

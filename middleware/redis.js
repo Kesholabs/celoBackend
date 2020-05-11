@@ -45,7 +45,9 @@ const getAccount = async (key, value) => {
       return msg;
     }
 
-    let token = await JWT.jsonwtSign({ account: key });
+    logger.debug("Generate JWT token ", key);
+
+    let token = await JWT.jsonwtSign({ key });
     logger.debug("Issue JWT ", token);
     return token;
   });
