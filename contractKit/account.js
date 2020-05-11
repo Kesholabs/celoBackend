@@ -16,7 +16,7 @@ const ratesJson = require(__dirname + "./../exchangeRates.json");
 async function createAccount(body) {
   console.log("Creating a new account");
   try {
-    const { account, password } = body;
+    const { account } = body;
     const identity = account;
     const wallet = web3Instance.eth.accounts.create();
     console.log(`Made new account ${wallet.address}`);
@@ -45,6 +45,11 @@ async function createAccount(body) {
 async function getAccount(identity) {
   console.log("Getting your account ", identity);
   try {
+    if (fs.existsSync("./public/" + identity)) {
+      console.log("Old account found, convert it");
+      await convertAccounts(identity);
+    }
+
     if (!fs.existsSync("./public/" + identity + ".json")) {
       console.log("No account found, create one first");
       return false;
@@ -117,6 +122,26 @@ function currencyConvertion(localCurrency, balances) {
   } catch (err) {
     console.error("Error parsing JSON string:", err);
     return err;
+  }
+}
+
+async function convertAccounts(identity) {
+  try {
+    const privateKey = fs.readFileSync("./public/" + identity, "utf8");
+    //ENCRYPT PRIVATE KEY
+    const encryptedData = await Crypto.encrypt(privateKey);
+
+    //WRITE PRIVATE KEY TO FILE
+    fs.writeFileSync(
+      "./public/" + identity + ".json",
+      JSON.stringify(encryptedData)
+    );
+    console.log("New file created");
+    //file removed
+    fs.unlinkSync("./public/" + identity);
+    console.log("Old file deleted");
+  } catch (err) {
+    console.error(err);
   }
 }
 
