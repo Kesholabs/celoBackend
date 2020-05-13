@@ -13,7 +13,18 @@ module.exports = {
     //ISSUE JWT
     const token = await Redis.getAccount(account, password);
     console.log(token);
-    const msg = await Helper.getSuccessMessage({ token: token });
+    const msg = await Helper.getSuccessMessage({ token });
+    return res.send(msg);
+  },
+  changePassword: async (req, res, next) => {
+    logger.info("\n=================== CHANGE PASSWORD ====================\n");
+    const { account, password, newpassword } = req.body;
+    const changedPwd = await Redis.changeAccount(
+      account,
+      password,
+      newpassword
+    );
+    const msg = await Helper.getSuccessMessage(changedPwd);
     return res.send(msg);
   }
 };

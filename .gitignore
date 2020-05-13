@@ -8,5 +8,6 @@ config.production.json
 config.test.json
 public/*
 REST.rest
+exchangeRates.json
 .env
 07*

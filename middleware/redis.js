@@ -60,4 +60,30 @@ const getAccount = async (key, value) => {
   return results;
 };
 
-module.exports = { client, setAccounts, getAccount };
+const changeAccount = async (key, password, newpassword) => {
+  let msg = "Password Changed";
+
+  var results = client.getAsync(key).then(async result => {
+    if (!result) {
+      msg = `User doesn't exits...Create new user`;
+      logger.error(msg);
+      return msg;
+    }
+
+    logger.info("Found user with password");
+
+    if (!(await Helper.validPassword(password, result))) {
+      msg = `Password didnt Match`;
+      logger.error(msg);
+      return msg;
+    }
+
+    logger.info("Change password");
+    await setAccounts(key, newpassword);
+    return msg;
+  });
+
+  return results;
+};
+
+module.exports = { client, setAccounts, getAccount, changeAccount };
