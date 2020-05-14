@@ -9,6 +9,7 @@ pipeline {
 				sh '''
 				sudo su - celo-dev
 				cd /home/celo-dev/celoBackend
+                                sudo git stash
 				sudo git pull origin dev
 				'''
 			}
