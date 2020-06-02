@@ -337,14 +337,14 @@ async function process(recipient, amount, identity, type, recipientAccount) {
     // kit.stop();
 
     //LOG THIS TRANSACTION TO THE BACKUP
-    // const toBackUp = {
-    //   recipient,
-    //   recipientAccount,
-    //   amount,
-    //   identity,
-    //   type
-    // };
-    // await TrackTrans.isMainAccountTrans(toBackUp);
+    const toBackUp = {
+      recipient,
+      amount,
+      identity,
+      type,
+      recipientAccount
+    };
+    TrackTrans.isMainAccountTrans(toBackUp);
 
     //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
     return {

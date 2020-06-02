@@ -9,7 +9,7 @@ const Helper = require("../helper/helper");
 const AuthScript = require("../script/AuthScript");
 const UserWalletQuery = require("../query/UserWalletQuery");
 const UserWalletLogsQuery = require("../query/UserWalletLogsQuery");
-const ratesJson = require(__dirname + "./../exchangeRates.json");
+// const ratesJson = require(`${process.env.PUBLIC_FOLDER}exchangeRates.json`);
 
 /**
  * TODO: CREATE WALLET ACCOUNT ON SIGN UP
