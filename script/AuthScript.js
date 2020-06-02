@@ -61,8 +61,9 @@ async function getPin({ account, password }) {
 
 async function changePin(account) {
   const token = await JWT.jsonwtSign({ account });
+  const pin = "";
   let query = { account };
-  let update = { token };
+  let update = { token, pin };
   await UserAccountModel.findOneAndUpdate(query, update, { new: true });
   return Helper.sendEmail(account, "Forgot Password", token); //send email to restart
 }
