@@ -20,13 +20,16 @@ cron.schedule("0 */1 * * *", async () => {
 
       const fileName = "exchangeRates.json";
 
-      fs.writeFile(fileName, JSON.stringify(rates), function (err) {
-        if (err) throw new Error(err);
-        logger.debug("EXCHANGE RATE DATA CREATED");
-      });
+      fs.writeFile(
+        `${process.env.PUBLIC_FOLDER}${fileName}`,
+        JSON.stringify(rates),
+        function (err) {
+          if (err) throw new Error(err);
+          logger.debug("EXCHANGE RATE DATA CREATED");
+        }
+      );
     })
     .catch(error => {
       logger.error(error);
     });
 });
-

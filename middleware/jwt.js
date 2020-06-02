@@ -1,7 +1,6 @@
-const jwt = require("jsonwebtoken");
 const Helper = require("../helper/helper");
 const logger = Helper.getLogger("JWTAuth_MIDDLEWARE");
-
+const jwt = require("jsonwebtoken");
 const secretKey = process.env.SECRET_KEY;
 
 const jsonwtSign = data => {

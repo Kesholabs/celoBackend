@@ -1,11 +1,11 @@
-const contractkit = require('@celo/contractkit');
+const contractkit = require("@celo/contractkit");
 const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE THIS TO OUR NODE ADDRESS
+const axios = require("axios");
 const kit = contractkit.newKit(NODE_URL);
 const Helper = require("../helper/helper");
 const logger = Helper.getLogger("CELO_TRANSACTION_METHODS");
 const accounts = require("./account");
-
-const axios = require('axios')
+const TrackTrans = require("../script/TrackTransScript");
 
 async function depositFunds(params) {
   console.log("\n================ DEPOSIT FUNDS =================\n");
@@ -15,6 +15,7 @@ async function depositFunds(params) {
 
   const { address } = await accounts.getAccount(identity);
   const data = {
+    identity,
     account: "MAIN_ACCOUNT",
     recipient: address,
     amount: amount,
@@ -39,7 +40,7 @@ async function orclDepositFunds(params) {
   } catch (e) {
     console.log("!!!!!!!| Forex err |!!!!!!", e);
   }
-  console.log('Forex Rate:', kesforex);
+  console.log("Forex Rate:", kesforex);
   //let amount = await accounts.currencyConvertion(currency, params.amount).cUsd; //TODO: CURRENCY IN WORLD CURRENCY
   let amount = params.amount / kesforex;
   console.log("Converted amt", amount);
@@ -52,11 +53,126 @@ async function orclDepositFunds(params) {
     const walletBalance = await kitContract.balanceOf(account.address);
     logger.info(`${identity} ACCOUNT BALANCE ${walletBalance}`);
 
-    let abi = [{ "inputs": [{ "internalType": "contract Kesholabs", "name": "prov", "type": "address" }, { "internalType": "contract StableToken", "name": "er", "type": "address" }], "payable": false, "stateMutability": "nonpayable", "type": "constructor" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "string", "name": "description", "type": "string" }], "name": "LogErrorInCallback", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "string", "name": "_description", "type": "string" }], "name": "LogNewKesholabsQuery", "type": "event" }, { "anonymous": false, "inputs": [{ "indexed": false, "internalType": "address", "name": "", "type": "address" }, { "indexed": false, "internalType": "uint256", "name": "", "type": "uint256" }], "name": "Received", "type": "event" }, { "payable": true, "stateMutability": "payable", "type": "fallback" }, { "constant": false, "inputs": [{ "internalType": "address", "name": "_sender", "type": "address" }, { "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "Kesholabs_query", "outputs": [{ "internalType": "bytes32", "name": "_id", "type": "bytes32" }], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": true, "inputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }], "name": "Queuemap", "outputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }, { "internalType": "address", "name": "sender", "type": "address" }], "payable": false, "stateMutability": "view", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "bytes32", "name": "_myid", "type": "bytes32" }, { "internalType": "uint8", "name": "_result", "type": "uint8" }], "name": "_callback", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "address", "name": "_to", "type": "address" }, { "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "deposit", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }, { "constant": false, "inputs": [{ "internalType": "uint48", "name": "_phoneNumber", "type": "uint48" }, { "internalType": "uint256", "name": "_amount", "type": "uint256" }], "name": "deposit", "outputs": [], "payable": false, "stateMutability": "nonpayable", "type": "function" }]
-    let contract = new kit.web3.eth.Contract(abi, '0xf0e7d0f01960a1f93394c73F3179CB494AfD32Aa')
+    let abi = [
+      {
+        inputs: [
+          { internalType: "contract Kesholabs", name: "prov", type: "address" },
+          { internalType: "contract StableToken", name: "er", type: "address" }
+        ],
+        payable: false,
+        stateMutability: "nonpayable",
+        type: "constructor"
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: false,
+            internalType: "string",
+            name: "description",
+            type: "string"
+          }
+        ],
+        name: "LogErrorInCallback",
+        type: "event"
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: false,
+            internalType: "string",
+            name: "_description",
+            type: "string"
+          }
+        ],
+        name: "LogNewKesholabsQuery",
+        type: "event"
+      },
+      {
+        anonymous: false,
+        inputs: [
+          {
+            indexed: false,
+            internalType: "address",
+            name: "",
+            type: "address"
+          },
+          { indexed: false, internalType: "uint256", name: "", type: "uint256" }
+        ],
+        name: "Received",
+        type: "event"
+      },
+      { payable: true, stateMutability: "payable", type: "fallback" },
+      {
+        constant: false,
+        inputs: [
+          { internalType: "address", name: "_sender", type: "address" },
+          { internalType: "uint48", name: "_phoneNumber", type: "uint48" },
+          { internalType: "uint256", name: "_amount", type: "uint256" }
+        ],
+        name: "Kesholabs_query",
+        outputs: [{ internalType: "bytes32", name: "_id", type: "bytes32" }],
+        payable: false,
+        stateMutability: "nonpayable",
+        type: "function"
+      },
+      {
+        constant: true,
+        inputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+        name: "Queuemap",
+        outputs: [
+          { internalType: "uint256", name: "amount", type: "uint256" },
+          { internalType: "address", name: "sender", type: "address" }
+        ],
+        payable: false,
+        stateMutability: "view",
+        type: "function"
+      },
+      {
+        constant: false,
+        inputs: [
+          { internalType: "bytes32", name: "_myid", type: "bytes32" },
+          { internalType: "uint8", name: "_result", type: "uint8" }
+        ],
+        name: "_callback",
+        outputs: [],
+        payable: false,
+        stateMutability: "nonpayable",
+        type: "function"
+      },
+      {
+        constant: false,
+        inputs: [
+          { internalType: "address", name: "_to", type: "address" },
+          { internalType: "uint48", name: "_phoneNumber", type: "uint48" },
+          { internalType: "uint256", name: "_amount", type: "uint256" }
+        ],
+        name: "deposit",
+        outputs: [],
+        payable: false,
+        stateMutability: "nonpayable",
+        type: "function"
+      },
+      {
+        constant: false,
+        inputs: [
+          { internalType: "uint48", name: "_phoneNumber", type: "uint48" },
+          { internalType: "uint256", name: "_amount", type: "uint256" }
+        ],
+        name: "deposit",
+        outputs: [],
+        payable: false,
+        stateMutability: "nonpayable",
+        type: "function"
+      }
+    ];
+    let contract = new kit.web3.eth.Contract(
+      abi,
+      "0xf0e7d0f01960a1f93394c73F3179CB494AfD32Aa"
+    );
 
-
-    const goldAmount = kit.web3.utils.toWei(`${amount}`, 'ether')
+    const goldAmount = kit.web3.utils.toWei(`${amount}`, "ether");
     console.log(">>>>>>>>>>Ethers", goldAmount);
     if (walletBalance.toNumber() < 0) {
       console.log("I have some gas");
@@ -64,30 +180,32 @@ async function orclDepositFunds(params) {
         from: account.address,
         gasPrice: 10000000000
       });
-      console.log(tx)
+      console.log(tx);
       if (!tx) {
-        return "Error Processing Request"
+        return "Error Processing Request";
       } else {
-        return tx
+        return tx;
       }
     } else {
       console.log("I need some gas");
       const mainAccount = await accounts.getAccount("MAIN_ACCOUNT");
       kit.addAccount(mainAccount.privateKey);
-      const tx = await contract.methods.deposit(account.address, phoneNumber, goldAmount).send({
-        from: mainAccount.address,
-        gasPrice: 10000000000
-      });
-      console.log(tx)
+      const tx = await contract.methods
+        .deposit(account.address, phoneNumber, goldAmount)
+        .send({
+          from: mainAccount.address,
+          gasPrice: 10000000000
+        });
+      console.log(tx);
       if (!tx) {
-        return "Error Processing Request"
+        return "Error Processing Request";
       } else {
-        return tx
+        return tx;
       }
     }
   } catch (e) {
     console.log(e);
-    return "Error Processing Request"
+    return "Error Processing Request";
   }
 }
 
@@ -100,6 +218,7 @@ async function withdrawFunds(params) {
   const ownWallet = await accounts.getAccount(identity);
   const walletAddress = await accounts.getAccount("MAIN_ACCOUNT");
   const data = {
+    identity: "MAIN_ACCOUNT",
     account: identity,
     ownAdress: ownWallet.address,
     recipient: walletAddress.address,
@@ -113,7 +232,8 @@ async function withdrawFunds(params) {
 async function transferFunds(params) {
   console.log("\n================ TRANSFER FUNDS=================\n");
   console.log("Body \n ", params);
-  const identity = params.account;
+  const identity = params.account; //MAIN ACCOUNT
+  const owner = params.identity; //OWNER ACCOUNT
   const ownAdress = params.ownAdress;
   const currency = params.currency;
   const amount = await accounts.currencyConvertion(currency, params.amount)
@@ -126,17 +246,17 @@ async function transferFunds(params) {
       console.log(
         `${type} payment of ${amount} from ${identity} : ${recipient}`
       );
-      return buyIn(recipient, amount, identity);
+      return buyIn(recipient, amount, identity, type, owner);
     case "Withdraw":
       console.log(
         `${type} payment of ${amount} from ${identity} : ${ownAdress}`
       );
-      return buyOut(recipient, amount, identity);
+      return buyOut(recipient, amount, identity, type, owner);
     case "Transfer":
       console.log(
         `${type} payment of ${amount} from ${identity} to ${recipient}`
       );
-      return send(recipient, amount, identity);
+      return send(recipient, amount, identity, type);
     default:
       console.log(
         `${type} payment of ${amount} from ${identity} : ${recipient}`
@@ -145,29 +265,26 @@ async function transferFunds(params) {
   }
 }
 
-async function buyIn(recipient, amount, identity) {
+async function buyIn(recipient, amount, identity, type, owner) {
   logger.info("Buyin Method");
-  return process(recipient, amount, identity);
+  return process(recipient, amount, identity, type, owner);
 }
 
-async function buyOut(recipient, amount, identity) {
+async function buyOut(recipient, amount, identity, type, owner) {
   logger.info("BuyOut Method");
-  return process(recipient, amount, identity);
+  return process(recipient, amount, identity, type, owner);
 }
 
-async function send(recipient, amount, identity) {
+async function send(recipient, amount, identity, type) {
   logger.info("Send Method");
   const { address } = await accounts.getAccount(recipient);
-  return process(address, amount, identity);
+  return process(address, amount, identity, type, recipient);
 }
 
-async function process(recipient, amount, identity) {
+async function process(recipient, amount, identity, type, recipientAccount) {
   logger.info("PROCESSING TRANSACTION");
   console.log(
-    "transer funds cUSD %s.......from %s to %s ",
-    amount,
-    identity,
-    recipient
+    `${type} funds cUSD ${amount}.......from ${identity} to ${recipient} ${recipientAccount} `
   );
 
   try {
@@ -219,8 +336,17 @@ async function process(recipient, amount, identity) {
     );
     // kit.stop();
 
-    //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
+    //LOG THIS TRANSACTION TO THE BACKUP
+    // const toBackUp = {
+    //   recipient,
+    //   recipientAccount,
+    //   amount,
+    //   identity,
+    //   type
+    // };
+    // await TrackTrans.isMainAccountTrans(toBackUp);
 
+    //TODO: CONVERT ALL AMOUNT BACK TO USD newOrganizationBalance, newBalance
     return {
       hash: hash,
       receipt: receipt,

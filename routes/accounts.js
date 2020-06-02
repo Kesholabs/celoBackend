@@ -19,9 +19,6 @@ const Controller = require("../controller/accountController");
  *       type:
  *         type: string
  *         example: own | merchant
- *       password:
- *          type: string
- *          example: account2019
  *
  *   AddressModel:
  *     type: object

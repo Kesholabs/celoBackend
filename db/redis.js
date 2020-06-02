@@ -4,7 +4,7 @@ bluebird.promisifyAll(redis.RedisClient.prototype);
 const REDIS_PORT = process.env.REDIS_PORT;
 const Helper = require("../helper/helper");
 const logger = Helper.getLogger("REDIS_MIDDLEWARE");
-const JWT = require("./jwt");
+const JWT = require("../middleware/jwt");
 
 const client = redis.createClient(REDIS_PORT);
 

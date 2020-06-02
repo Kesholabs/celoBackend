@@ -29,7 +29,7 @@ const Controller = require("../controller/authController");
  *     properties:
  *       account:
  *         type: string
- *         example: old password
+ *         example: john@gmail.com
  *       password:
  *          type: string
  *          example: new password
@@ -62,7 +62,7 @@ const Controller = require("../controller/authController");
  *         description: Error Occurred - Invalid Access Token
  */
 
-/* POST DEPOSIT /api/v1/auth */
+/* AUTH - /api/v1/auth */
 router.post("/", Controller.validateAccount);
 
 /**
@@ -94,7 +94,11 @@ router.post("/", Controller.validateAccount);
  *      - Bearer: []
  */
 
-/* POST DEPOSIT /api/v1/auth/changepassword */
-router.post("/changepassword", Jwt.verify, Controller.validateAccount);
+/* AUTH - /api/v1/auth/changepassword */
+router.post("/changepassword", Controller.changePassword);
+
+
+/* AUTH - /api/v1/auth/resetpassword/:token */
+router.post("/reset", Controller.redirect);
 
 module.exports = router;

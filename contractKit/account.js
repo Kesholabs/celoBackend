@@ -4,10 +4,11 @@ const web3Instance = new web3();
 const contractkit = require("@celo/contractkit");
 const NODE_URL = "https://alfajores-forno.celo-testnet.org"; //..TODO: CHANGE THIS TO OUR NODE ADDRESS
 const kit = contractkit.newKit(NODE_URL);
-const Helper = require("../helper/helper");
 const Crypto = require("../middleware/crypto");
-const Redis = require("../middleware/redis");
-
+const Helper = require("../helper/helper");
+const AuthScript = require("../script/AuthScript");
+const UserWalletQuery = require("../query/UserWalletQuery");
+const UserWalletLogsQuery = require("../query/UserWalletLogsQuery");
 const ratesJson = require(__dirname + "./../exchangeRates.json");
 
 /**
@@ -26,12 +27,23 @@ async function createAccount(body) {
 
     //WRITE PRIVATE KEY TO FILE
     fs.writeFileSync(
-      "./public/" + identity + ".json",
+      `${process.env.PUBLIC_FOLDER}${identity}.json`,
       JSON.stringify(encryptedData)
     );
     console.log(`Account private key saved to ${identity}`);
     console.log(`Wallet Address ${wallet.address}`);
 
+    await AuthScript.createUserAccount(body);
+
+    //create new userWallet
+    const transId = await Helper.transTypeID("Creation");
+    const data = {
+      account: identity,
+      transId: transId,
+      transType: "Account Creation"
+    };
+    UserWalletQuery.createUserWallet(data); //create new userWallet
+    UserWalletLogsQuery.createUserWalletLogs(data); //create new userWalletLogs
     return wallet.address;
   } catch (error) {
     console.error(error);
@@ -45,18 +57,18 @@ async function createAccount(body) {
 async function getAccount(identity) {
   console.log("Getting your account ", identity);
   try {
-    if (fs.existsSync("./public/" + identity)) {
+    if (fs.existsSync(`${process.env.PUBLIC_FOLDER}${identity}`)) {
       console.log("Old account found, convert it");
       await convertAccounts(identity);
     }
 
-    if (!fs.existsSync("./public/" + identity + ".json")) {
+    if (!fs.existsSync(`${process.env.PUBLIC_FOLDER}${identity}.json`)) {
       console.log("No account found, create one first");
       return false;
     }
 
     const privateKey = fs.readFileSync(
-      "./public/" + identity + ".json",
+      `${process.env.PUBLIC_FOLDER}${identity}.json`,
       "utf8"
     );
     const decode = await Crypto.decrypt(JSON.parse(privateKey));
@@ -127,18 +139,21 @@ function currencyConvertion(localCurrency, balances) {
 
 async function convertAccounts(identity) {
   try {
-    const privateKey = fs.readFileSync("./public/" + identity, "utf8");
+    const privateKey = fs.readFileSync(
+      `${process.env.PUBLIC_FOLDER}${identity}`,
+      "utf8"
+    );
     //ENCRYPT PRIVATE KEY
     const encryptedData = await Crypto.encrypt(privateKey);
 
     //WRITE PRIVATE KEY TO FILE
     fs.writeFileSync(
-      "./public/" + identity + ".json",
+      `${process.env.PUBLIC_FOLDER}${identity}.json`,
       JSON.stringify(encryptedData)
     );
     console.log("New file created");
     //file removed
-    fs.unlinkSync("./public/" + identity);
+    fs.unlinkSync(`${process.env.PUBLIC_FOLDER}${identity}`);
     console.log("Old file deleted");
   } catch (err) {
     console.error(err);

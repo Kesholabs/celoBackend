@@ -11,6 +11,7 @@
   "dependencies": {
     "@celo/contractkit": "^0.2.14",
     "axios": "^0.19.2",
+    "@sendgrid/mail": "^6.5.2",
     "bcrypt": "^4.0.1",
     "bluebird": "^3.7.2",
     "body-parser": "~1.17.1",
@@ -22,6 +23,7 @@
     "global": "^4.4.0",
     "jsonwebtoken": "^8.5.1",
     "log4js": "^4.1.0",
+    "mongoose": "^5.9.15",
     "morgan": "~1.8.1",
     "node-cron": "^2.0.3",
     "qrcode": "^1.4.4",

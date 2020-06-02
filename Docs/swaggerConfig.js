@@ -13,6 +13,10 @@ const definition = {
   basePath: "/api/v1",
   tags: [
     {
+      name: "Admin",
+      description: "This should allow admin to manage `SYSTEM`."
+    },
+    {
       name: "Auth",
       description: "This should allow users to validate their `ACCOUNT`."
     },
