@@ -24,15 +24,15 @@ const Controller = require("../controller/authController");
  *   ChangePwdModel:
  *     type: object
  *     required:
- *       - password
- *       - newpassword
+ *       - account
+ *       - authToken
  *     properties:
  *       account:
  *         type: string
  *         example: john@gmail.com
- *       password:
+ *       authToken:
  *          type: string
- *          example: new password
+ *          example: user auth token
  */
 
 /**
@@ -96,7 +96,6 @@ router.post("/", Controller.validateAccount);
 
 /* AUTH - /api/v1/auth/changepassword */
 router.post("/changepassword", Controller.changePassword);
-
 
 /* AUTH - /api/v1/auth/resetpassword/:token */
 router.post("/reset", Controller.redirect);

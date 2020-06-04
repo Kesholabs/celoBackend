@@ -90,7 +90,8 @@ var transTypeID = function (type) {
 var sendEmail = async function (account, subject, token) {
   console.log("\n\n=============== SENDING EMAIL ================\n\n");
 
-  const urlRedirection = `https://celo.pesabase.com/api/v1/auth/resetpassword/${token}`;
+  // const urlRedirection = `https://celo.pesabase.com/api/v1/auth/resetpassword/${token}`;
+  const urlRedirection = `https://pesabase.com/resetpassword/${token}`;
   const emailRes = false;
   const message = await htmlMessage(urlRedirection, account);
 
@@ -109,10 +110,7 @@ var sendEmail = async function (account, subject, token) {
         return emailRes;
       }
 
-      logger.info(
-        JSON.stringify(info) +
-          "\n\n Email Sent 💯💯💯💯💯😝😝😝😝😝😝😝😝😝😝😝😝😝😝😝😝😝\n\n"
-      );
+      logger.info("\n Email Sent \n");
       return true;
     } catch (err) {
       logger.error(err);

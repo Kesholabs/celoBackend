@@ -59,8 +59,9 @@ async function getPin({ account, password }) {
   return token;
 }
 
-async function changePin(account) {
-  const token = await JWT.jsonwtSign({ account });
+async function changePin(account, authToken) {
+  // const token = await JWT.jsonwtSign({ account });
+  const token = authToken
   const pin = "";
   let query = { account };
   let update = { token, pin };

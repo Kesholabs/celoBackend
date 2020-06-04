@@ -18,11 +18,10 @@ module.exports = {
 
   changePassword: async (req, res, next) => {
     logger.info("\n=================== CHANGE PASSWORD ====================\n");
-    const { account, password, newpassword } = req.body;
+    const { account, authToken } = req.body;
     const changedPwd = await AuthScript.changePin(
       account,
-      password,
-      newpassword
+      authToken
     );
     const msg = await Helper.getSuccessMessage(changedPwd);
     return res.send(msg);
