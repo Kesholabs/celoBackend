@@ -40,7 +40,7 @@ async function getPin({ account, password }) {
   }
 
   let pinResult = existingUserAccount.pin;
-  if (pinResult === "Not Touched") {
+  if (pinResult === "Not Touched" || !pinResult) {
     logger.info("User Account does not have a Pin");
     logger.info("Create pin ");
     const { pin } = await setPin(account, password);
@@ -61,7 +61,7 @@ async function getPin({ account, password }) {
 
 async function changePin(account, authToken) {
   // const token = await JWT.jsonwtSign({ account });
-  const token = authToken
+  const token = authToken;
   const pin = "";
   let query = { account };
   let update = { token, pin };
