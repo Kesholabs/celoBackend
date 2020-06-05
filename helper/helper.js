@@ -91,14 +91,14 @@ var sendEmail = async function (account, subject, token) {
   console.log("\n\n=============== SENDING EMAIL ================\n\n");
 
   // const urlRedirection = `https://celo.pesabase.com/api/v1/auth/resetpassword/${token}`;
-  const urlRedirection = `https://pesabase.com/resetpassword/${token}`;
+  const urlRedirection = `https://pesabase.com/resetpin/${token}`;
   const emailRes = false;
   const message = await htmlMessage(urlRedirection, account);
 
   try {
     const mailOptions = {
       to: account,
-      from: "info@deficon.africa",
+      from: "info@pesabase.com",
       subject: subject,
       html: `${message}`
     };
