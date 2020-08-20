@@ -12,7 +12,7 @@
     "@celo/contractkit": "^0.2.14",
     "axios": "^0.19.2",
     "@sendgrid/mail": "^6.5.2",
-    "bcrypt": "^4.0.1",
+    "bcrypt": "^5.0.0",
     "bluebird": "^3.7.2",
     "body-parser": "~1.17.1",
     "cookie-parser": "~1.4.3",
